@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Recording — Upbuild</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><a class="logo" href="/">Upbuild</a></header>
+  <main>
+    <h1>Submit Your Coaching Recording</h1>
+
+    <div id="banner-area"></div>
+
+    <div class="form-group">
+      <label for="student-select">Your Name</label>
+      <select id="student-select"><option value="">Select your name</option></select>
+    </div>
+
+    <div class="form-group">
+      <label>Round</label>
+      <div style="display:flex;gap:16px;margin-top:4px;">
+        <label style="font-weight:normal"><input type="radio" name="round" value="1"> Round 1</label>
+        <label style="font-weight:normal"><input type="radio" name="round" value="2"> Round 2</label>
+        <label style="font-weight:normal"><input type="radio" name="round" value="3"> Round 3</label>
+        <label style="font-weight:normal"><input type="radio" name="round" value="4"> Round 4</label>
+      </div>
+    </div>
+
+    <div id="duplicate-warning" class="alert alert-warning" style="display:none">
+      <strong>You already submitted this round.</strong> Submitting again will create a second entry.
+      <div style="margin-top:8px"><label><input type="checkbox" id="duplicate-confirm"> I understand, continue anyway</label></div>
+    </div>
+
+    <div class="form-group">
+      <label for="video-file">Coaching Session Recording</label>
+      <input type="file" id="video-file" accept=".mp4,.mov,.webm,.avi">
+      <div id="file-size" class="text-gray mt-16"></div>
+    </div>
+
+    <h2>Meta-Skills Self-Rating</h2>
+    <div id="meta-skills-ratings"></div>
+
+    <h2>Skills Self-Rating</h2>
+    <div id="skills-ratings"></div>
+
+    <h2>Reflections</h2>
+    <div id="reflection-questions"></div>
+
+    <div id="progress-area" style="display:none">
+      <div class="alert alert-warning" id="progress-msg">Processing your submission…</div>
+    </div>
+
+    <div id="success-area" style="display:none" class="alert alert-success"></div>
+
+    <button class="btn btn-primary" id="submit-btn" style="margin-top:8px">Submit Recording</button>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/submission.js"></script>
+</body>
+</html>
