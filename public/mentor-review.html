@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentor Review — Upbuild</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><a class="logo" href="/">Upbuild</a></header>
+  <main>
+    <h1 id="page-title">Mentor Review</h1>
+    <div id="banner-area"></div>
+    <div id="content" style="display:none">
+      <table id="ratings-table">
+        <thead>
+          <tr><th>Competency</th><th>Coach's Rating</th><th>Your Rating</th></tr>
+        </thead>
+        <tbody id="ratings-body"></tbody>
+      </table>
+
+      <hr class="divider">
+      <h2>Coach's Reflections</h2>
+      <div id="coach-reflections"></div>
+
+      <hr class="divider">
+      <h2>Your Feedback</h2>
+      <div id="mentor-feedback-fields"></div>
+
+      <button class="btn btn-primary" id="submit-btn">Submit Feedback</button>
+      <div id="submit-success" class="alert alert-success mt-16" style="display:none"></div>
+    </div>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/mentor-review.js"></script>
+</body>
+</html>
