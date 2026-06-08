@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcript — Upbuild</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header><a class="logo" href="/">Upbuild</a></header>
+  <main>
+    <p id="caption" class="text-gray"></p>
+    <hr class="divider">
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="btn btn-secondary btn-sm" id="download-txt">Download .txt</button>
+      <a class="btn btn-secondary btn-sm" id="download-docx">Download .docx</a>
+    </div>
+    <pre id="transcript-content" style="white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.7"></pre>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/transcript.js"></script>
+</body>
+</html>
