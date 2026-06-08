@@ -12,9 +12,15 @@ app.use('/api/mentors', require('./routes/mentors'));
 app.use('/api/assessments', require('./routes/assessments'));
 app.use('/api/admin', require('./routes/admin'));
 
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
+
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: err.message || 'Internal server error' });
+  console.error(err.stack);
+  const status = err.status || err.statusCode || 500;
+  const message = process.env.NODE_ENV === 'production' && status === 500
+    ? 'Internal server error'
+    : (err.message || 'Internal server error');
+  res.status(status).json({ error: message });
 });
 
 const PORT = process.env.PORT || 3000;
