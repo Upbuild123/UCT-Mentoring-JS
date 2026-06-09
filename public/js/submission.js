@@ -165,7 +165,7 @@ document.getElementById('video-file').addEventListener('change', e => {
 });
 
 document.getElementById('submit-btn').addEventListener('click', async () => {
-  const bannerArea = document.getElementById('banner-area');
+  const bannerArea = document.getElementById('submit-error-area');
   const studentId = document.getElementById('student-select').value;
   const round = document.querySelector('input[name=round]:checked')?.value;
   const videoFile = document.getElementById('video-file').files[0];
@@ -235,7 +235,7 @@ async function pollStatus(assessmentId) {
         clearInterval(interval);
         document.getElementById('progress-area').style.display = 'none';
         document.getElementById('submit-btn').disabled = false;
-        showBanner(document.getElementById('banner-area'), 'Something went wrong with your submission. Please contact your coordinator.');
+        showBanner(document.getElementById('submit-error-area'), 'Something went wrong with your submission. Please contact your coordinator.');
       }
     } catch {}
   }, 3000);
