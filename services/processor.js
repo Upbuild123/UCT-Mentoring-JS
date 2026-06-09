@@ -44,7 +44,7 @@ async function processAssessment(assessmentId, videoPath) {
 
     // Step 3+4: Extract audio + transcribe (skip if transcript already saved)
     let transcript = assessment.transcript;
-    const audioPath = videoPath ? videoPath.replace(/\.[^.]+$/, '.mp3') : null;
+    const audioPath = videoPath ? videoPath + '.mp3' : null;
     if (!transcript) {
       if (videoPath && fs.existsSync(videoPath)) {
         await openai.extractAudio(videoPath, audioPath);
