@@ -13,7 +13,7 @@ async function requireDashboardAccess(req, res, next) {
   next();
 }
 
-router.get('/', async (req, res, next) => {
+router.get('/', requireAdmin, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('mentors')

@@ -118,7 +118,7 @@ function renderMentors() {
       <summary>${m.name} — ${m.email}</summary>
       <div style="margin-top:12px">
         <p class="text-gray">Students: ${myStudents.map(s => s.name).join(', ') || 'None'}</p>
-        <p class="text-gray mt-16">Dashboard: <a href="${appUrl}/mentor-dashboard.html?mentor_id=${m.id}" target="_blank">${appUrl}/mentor-dashboard.html?mentor_id=${m.id}</a></p>
+        <p class="text-gray mt-16">Dashboard: <a href="${appUrl}/mentor-dashboard.html?mentor_id=${m.id}&token=${m.dashboard_token || ''}" target="_blank">${appUrl}/mentor-dashboard.html?mentor_id=${m.id}&token=${m.dashboard_token || ''}</a></p>
         <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
           <div class="form-group" style="flex:1"><label>Name</label><input type="text" class="edit-mentor-name" value="${m.name}"></div>
           <div class="form-group" style="flex:1"><label>Email</label><input type="email" class="edit-mentor-email" value="${m.email}"></div>
