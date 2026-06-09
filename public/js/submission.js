@@ -203,8 +203,11 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   try {
     const res = await fetch('/api/assessments/submit', { method: 'POST', body: formData });
     if (!res.ok) throw new Error((await res.json()).error || 'Submission failed');
-    const { assessment_id } = await res.json();
-    pollStatus(assessment_id);
+    localStorage.removeItem(DRAFT_KEY);
+    document.getElementById('progress-area').style.display = 'none';
+    const successArea = document.getElementById('success-area');
+    successArea.style.display = 'block';
+    successArea.textContent = 'Your recording has successfully uploaded. Your mentor will be notified shortly.';
   } catch (err) {
     document.getElementById('submit-btn').disabled = false;
     document.getElementById('progress-area').style.display = 'none';
