@@ -1,14 +1,14 @@
 const RATING_OPTIONS = ['-- select --', '1. Not Demonstrated', '2. Emerging', '3. Competent', '4. Exceptional'];
 const COMPETENCIES = [
-  { name: 'Know Yourself', category: 'Meta-Skills' },
-  { name: 'Experiment and Learn', category: 'Meta-Skills' },
-  { name: 'Serve Not Fix', category: 'Meta-Skills' },
-  { name: 'Call on the Creative', category: 'Meta-Skills' },
-  { name: 'Co-Creating and Maintaining the Relationship', category: 'Skills' },
-  { name: 'Structuring the Coaching Session', category: 'Skills' },
-  { name: 'Listening', category: 'Skills' },
-  { name: 'Asking Curious and Powerful Questions', category: 'Skills' },
-  { name: 'Balancing Action and Learning', category: 'Skills' },
+  { name: 'Know Yourself', category: 'Meta-Skills', description: 'Uses self-knowledge and self-work to help the client discover who they are.' },
+  { name: 'Experiment and Learn', category: 'Meta-Skills', description: 'Holds an experimental mindset, interacts with the client in new ways, and takes risks for the sake of the client.' },
+  { name: 'Serve Not Fix', category: 'Meta-Skills', description: 'Focuses on coaching the whole person and their whole life, not the problem or issue; explores what it means to serve this client; avoids being an expert and advice-giver.' },
+  { name: 'Call on the Creative', category: 'Meta-Skills', description: 'Accesses and coaches from the creative level of consciousness to help the client access and live from their creative consciousness.' },
+  { name: 'Co-Creating and Maintaining the Relationship', category: 'Skills', description: '"Keeping your seat" as the coach – establishes agreements; cultivates trust, safety and mutual respect; partners around overall client outcomes and measures of success.' },
+  { name: 'Structuring the Coaching Session', category: 'Skills', description: 'Follows 10/80/10 structure; partnering with the client to manage time; 10% (topic, agenda, desired outcomes), 80% (exploration and deepening of learning), 10% (action, next steps, accountability); discovers and holds presenting, deeper and transformational agendas.' },
+  { name: 'Listening', category: 'Skills', description: 'Offers full presence, listens without judgment, and hears what the client might be saying separate from their words.' },
+  { name: 'Asking Curious and Powerful Questions', category: 'Skills', description: 'Practices open-ended questions that invite exploration of possibility and the unknown.' },
+  { name: 'Balancing Action and Learning', category: 'Skills', description: 'Invites the client to engage in personal reflection to deepen their learning and take meaningful action to move toward their goals; allows the client to do the work.' },
 ];
 const REFLECTION_QUESTIONS = [
   { q: 'What did you do well in this coaching session?', required: true },
@@ -47,8 +47,14 @@ async function init() {
         o.textContent = opt;
         select.appendChild(o);
       }
+      const desc = document.createElement('p');
+      desc.className = 'text-gray';
+      desc.style.marginTop = '4px';
+      desc.style.fontStyle = 'italic';
+      desc.textContent = comp.description;
       div.appendChild(label);
       div.appendChild(select);
+      div.appendChild(desc);
       container.appendChild(div);
     }
   }
