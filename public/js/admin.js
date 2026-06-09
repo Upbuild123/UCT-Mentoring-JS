@@ -58,17 +58,31 @@ async function loadAll() {
 }
 
 document.getElementById('status-filter').addEventListener('change', renderAssessments);
+document.getElementById('assessment-search').addEventListener('input', renderAssessments);
 
 function renderAssessments() {
   const filter = document.getElementById('status-filter').value;
+  const search = document.getElementById('assessment-search').value.toLowerCase();
   const list = document.getElementById('assessments-list');
-  const filtered = filter ? allAssessments.filter(a => a.status === filter) : allAssessments;
+  let filtered = filter ? allAssessments.filter(a => a.status === filter) : allAssessments;
+  if (search) filtered = filtered.filter(a =>
+    (a.student_name || '').toLowerCase().includes(search) ||
+    (a.mentor_name || '').toLowerCase().includes(search)
+  );
   list.innerHTML = '';
   for (const a of filtered) {
     const card = document.createElement('div');
     card.className = 'card';
     const badgeClass = STATUS_BADGE[a.status] || 'badge-gray';
     const date = a.submitted_at ? new Date(a.submitted_at).toLocaleDateString() : '—';
+    const t = a.mentor_token ? `&token=${a.mentor_token}` : '';
+
+    let processingWarning = '';
+    if (a.status === 'processing' && a.submitted_at) {
+      const mins = Math.floor((Date.now() - new Date(a.submitted_at)) / 60000);
+      if (mins > 20) processingWarning = `<span class="badge badge-orange">Processing for ${mins}m — may be stuck</span>`;
+    }
+
     card.innerHTML = `
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <strong>${a.student_name}</strong>
@@ -76,11 +90,16 @@ function renderAssessments() {
         <span>Round ${a.round}</span>
         <span class="text-gray">${date}</span>
         <span class="badge ${badgeClass}">${a.status}</span>
+        ${processingWarning}
         ${a.error_message ? `<span class="text-gray" title="${a.error_message}">⚠ ${a.error_message.slice(0, 60)}</span>` : ''}
-        <div style="margin-left:auto;display:flex;gap:6px">
-          <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}${a.mentor_token ? `&token=${a.mentor_token}` : ''}">Review</a>
+        <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+          <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}${t}">Review</a>
+          ${a.transcript || a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/transcript.html?assessment_id=${a.id}${t}" target="_blank">Transcript</a>` : ''}
+          ${a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/ai-review.html?assessment_id=${a.id}${t}" target="_blank">AI Review</a>` : ''}
+          ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">PDF</a>` : ''}
+          ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
           ${a.status === 'error' ? `<button class="btn btn-secondary btn-sm" onclick="retryAssessment(${a.id})">Retry</button>` : ''}
-          ${a.status === 'complete' ? `<button class="btn btn-secondary btn-sm" onclick="regenerateReview(${a.id})">Regenerate AI Review</button>` : ''}
+          ${a.status === 'complete' ? `<button class="btn btn-secondary btn-sm" onclick="regenerateReview(${a.id})">Regen AI</button>` : ''}
           <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteAssessment(${a.id})">Delete</button>
         </div>
       </div>`;
@@ -237,4 +256,20 @@ function renderOverview() {
     tr.innerHTML = `<td>${s.name}</td><td>${mentorName}</td><td>${rounds}</td>`;
     tbody.appendChild(tr);
   }
+}
+
+function exportOverviewCsv() {
+  const rows = [['Student', 'Mentor', 'Rounds Submitted']];
+  const sorted = [...allStudents].sort((a, b) => a.name.localeCompare(b.name));
+  for (const s of sorted) {
+    const mentorName = allMentors.find(m => m.id === s.mentor_id)?.name || '';
+    const rounds = allAssessments.filter(a => a.student_id === s.id).length;
+    rows.push([s.name, mentorName, rounds]);
+  }
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'upbuild-overview.csv'; a.click();
+  URL.revokeObjectURL(url);
 }

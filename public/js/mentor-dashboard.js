@@ -40,6 +40,7 @@ if (!token) {
       } else {
         const table = document.createElement('table');
         table.innerHTML = '<thead><tr><th>Round</th><th>Date</th><th>Feedback Status</th><th>Links</th></tr></thead>';
+
         const tbody = document.createElement('tbody');
         for (const a of studentAssessments) {
           const hasFeedback = Array.isArray(a.mentor_feedback) ? a.mentor_feedback.length > 0 : !!a.mentor_feedback;
@@ -52,9 +53,10 @@ if (!token) {
             <td>Round ${a.round}</td>
             <td>${date}</td>
             <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-            <td>
+            <td style="display:flex;gap:6px;flex-wrap:wrap">
               <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}&token=${assessmentToken}">Review</a>
-              ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank" style="margin-left:6px">Drive</a>` : ''}
+              ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">View PDF</a>` : ''}
+              ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
             </td>`;
           tbody.appendChild(tr);
         }

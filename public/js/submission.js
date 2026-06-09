@@ -19,6 +19,43 @@ const REFLECTION_QUESTIONS = [
   { q: 'If your session is longer than 30 minutes, which portion of the recording should your mentor listen to?', required: false },
 ];
 
+const DRAFT_KEY = 'submission_draft';
+
+function saveDraft() {
+  const draft = {
+    studentId: document.getElementById('student-select').value,
+    round: document.querySelector('input[name=round]:checked')?.value || null,
+    ratings: {},
+    reflections: {},
+  };
+  for (const sel of document.querySelectorAll('.competency-select')) {
+    draft.ratings[sel.dataset.competency] = sel.value;
+  }
+  for (const ta of document.querySelectorAll('.reflection-textarea')) {
+    draft.reflections[ta.dataset.question] = ta.value;
+  }
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function restoreDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    if (!draft) return;
+    if (draft.studentId) document.getElementById('student-select').value = draft.studentId;
+    if (draft.round) {
+      const radio = document.querySelector(`input[name=round][value="${draft.round}"]`);
+      if (radio) radio.checked = true;
+    }
+    for (const sel of document.querySelectorAll('.competency-select')) {
+      if (draft.ratings[sel.dataset.competency]) sel.value = draft.ratings[sel.dataset.competency];
+    }
+    for (const ta of document.querySelectorAll('.reflection-textarea')) {
+      if (draft.reflections[ta.dataset.question] !== undefined) ta.value = draft.reflections[ta.dataset.question];
+    }
+    checkDuplicate();
+  } catch {}
+}
+
 async function init() {
   const students = await apiFetch('/api/students');
   const sel = document.getElementById('student-select');
@@ -66,6 +103,12 @@ async function init() {
     }
   }
 
+  // Attach autosave to student/round inputs (competency and reflection containers use delegation below)
+  document.getElementById('student-select').addEventListener('change', saveDraft);
+  document.querySelectorAll('input[name=round]').forEach(r => r.addEventListener('change', saveDraft));
+  document.getElementById('meta-skills-ratings').addEventListener('change', saveDraft);
+  document.getElementById('skills-ratings').addEventListener('change', saveDraft);
+
   const reflContainer = document.getElementById('reflection-questions');
   for (const { q, required } of REFLECTION_QUESTIONS) {
     const div = document.createElement('div');
@@ -90,8 +133,11 @@ async function init() {
     if (required) textarea.required = true;
     div.appendChild(label);
     div.appendChild(textarea);
+    textarea.addEventListener('input', saveDraft);
     reflContainer.appendChild(div);
   }
+
+  restoreDraft();
 }
 
 let duplicateExists = false;
@@ -180,6 +226,7 @@ async function pollStatus(assessmentId) {
       msg.textContent = statusMessages[status] || 'Processing…';
       if (status === 'complete') {
         clearInterval(interval);
+        localStorage.removeItem(DRAFT_KEY);
         document.getElementById('progress-area').style.display = 'none';
         const successArea = document.getElementById('success-area');
         successArea.style.display = 'block';

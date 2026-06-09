@@ -27,7 +27,11 @@
       <h2>Your Feedback</h2>
       <div id="mentor-feedback-fields"></div>
 
-      <button class="btn btn-primary" id="submit-btn">Submit Feedback</button>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-primary" id="submit-btn">Submit Feedback</button>
+        <button class="btn btn-secondary" id="save-draft-btn">Save Draft</button>
+        <span id="draft-saved" style="display:none;color:var(--gray);font-size:13px">Draft saved</span>
+      </div>
       <div id="submit-success" class="alert alert-success mt-16" style="display:none"></div>
     </div>
   </main>

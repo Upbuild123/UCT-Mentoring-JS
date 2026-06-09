@@ -113,6 +113,20 @@ async function processAssessment(assessmentId, videoPath) {
       .from('assessments')
       .update({ status: 'error', error_message: err.message })
       .eq('id', assessmentId);
+    // Alert coordinator
+    try {
+      const { data: a } = await supabase
+        .from('assessments')
+        .select('round, students(name)')
+        .eq('id', assessmentId)
+        .single();
+      await email.sendAdminErrorAlert({
+        assessmentId,
+        studentName: a?.students?.name || 'Unknown',
+        roundNum: a?.round || '?',
+        errorMessage: err.message,
+      });
+    } catch {}
     throw err;
   }
 }

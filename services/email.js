@@ -62,4 +62,39 @@ async function sendCompletionNotification({ mentorEmail, mentorName, studentEmai
   }
 }
 
-module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification };
+async function sendMentorReminder({ mentorEmail, mentorName, studentName, roundNum, assessmentId, mentorToken, dashboardToken, mentorId, reminderNum }) {
+  const mentorFirst = mentorName.split(' ')[0];
+  const studentFirst = studentName.split(' ')[0];
+  const appUrl = APP_URL();
+  const t = mentorToken ? `&token=${mentorToken}` : '';
+  const dt = dashboardToken ? `&token=${dashboardToken}` : '';
+  await getClient().emails.send({
+    from: FROM(),
+    to: mentorEmail,
+    subject: `Reminder: ${studentName}'s Round ${roundNum} feedback is waiting`,
+    html: `<p>Hi ${mentorFirst},</p>
+<p>This is a reminder that ${studentFirst} is waiting for your feedback on their Round ${roundNum} coaching session.</p>
+<ul>
+  <li><a href="${appUrl}/transcript.html?assessment_id=${assessmentId}${t}">Transcript</a></li>
+  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI-generated review</a></li>
+</ul>
+<p><a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}${t}">Submit your feedback</a></p>
+<p><a href="${appUrl}/mentor-dashboard.html?mentor_id=${mentorId}${dt}">View your mentor dashboard</a></p>`,
+  });
+}
+
+async function sendAdminErrorAlert({ assessmentId, studentName, roundNum, errorMessage }) {
+  await getClient().emails.send({
+    from: FROM(),
+    to: 'michael@upbuild.com',
+    subject: `Processing Error: ${studentName} Round ${roundNum}`,
+    html: `<p>An assessment failed to process.</p>
+<p><strong>Student:</strong> ${studentName}<br>
+<strong>Round:</strong> ${roundNum}<br>
+<strong>Assessment ID:</strong> ${assessmentId}<br>
+<strong>Error:</strong> ${errorMessage}</p>
+<p>Log in to the admin panel to retry.</p>`,
+  });
+}
+
+module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendMentorReminder, sendAdminErrorAlert };

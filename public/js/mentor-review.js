@@ -22,6 +22,31 @@ const MENTOR_QUESTIONS = [
 const params = new URLSearchParams(location.search);
 const assessmentId = params.get('assessment_id');
 const token = params.get('token');
+const DRAFT_KEY = `mentor_draft_${assessmentId}`;
+
+function saveMentorDraft() {
+  const draft = { ratings: {}, feedback: {} };
+  for (const sel of document.querySelectorAll('.mentor-rating-select')) {
+    draft.ratings[sel.dataset.competency] = sel.value;
+  }
+  for (const ta of document.querySelectorAll('.mentor-feedback-textarea')) {
+    draft.feedback[ta.dataset.question] = ta.value;
+  }
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function restoreMentorDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    if (!draft) return;
+    for (const sel of document.querySelectorAll('.mentor-rating-select')) {
+      if (draft.ratings[sel.dataset.competency]) sel.value = draft.ratings[sel.dataset.competency];
+    }
+    for (const ta of document.querySelectorAll('.mentor-feedback-textarea')) {
+      if (draft.feedback[ta.dataset.question] !== undefined) ta.value = draft.feedback[ta.dataset.question];
+    }
+  } catch {}
+}
 
 if (!token) {
   document.addEventListener('DOMContentLoaded', () => {
@@ -82,10 +107,17 @@ if (!token) {
       textarea.dataset.question = q;
       textarea.className = 'mentor-feedback-textarea';
       textarea.value = existingFeedback[q] || '';
+      textarea.addEventListener('input', saveMentorDraft);
       div.appendChild(label);
       div.appendChild(textarea);
       feedbackContainer.appendChild(div);
     }
+
+    // Attach rating change listeners
+    document.getElementById('ratings-body').addEventListener('change', saveMentorDraft);
+
+    // Restore any saved draft (overrides DB values only if draft exists)
+    restoreMentorDraft();
   }
 
   document.getElementById('submit-btn').addEventListener('click', async () => {
@@ -108,6 +140,7 @@ if (!token) {
         method: 'POST',
         body: { feedback_text: feedbackText, mentor_ratings: mentorRatings },
       });
+      localStorage.removeItem(DRAFT_KEY);
       const success = document.getElementById('submit-success');
       success.style.display = 'block';
       success.textContent = 'Feedback submitted. The assessment PDF is being generated and will be emailed to both you and the coach.';
@@ -115,6 +148,13 @@ if (!token) {
       document.getElementById('submit-btn').disabled = false;
       showBanner(bannerArea, err.message);
     }
+  });
+
+  document.getElementById('save-draft-btn').addEventListener('click', () => {
+    saveMentorDraft();
+    const msg = document.getElementById('draft-saved');
+    msg.style.display = 'inline';
+    setTimeout(() => { msg.style.display = 'none'; }, 2000);
   });
 
   init().catch(err => showBanner(document.getElementById('banner-area'), err.message));
