@@ -143,8 +143,8 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 });
 
 const statusMessages = {
-  submitted: 'Uploading to Drive…',
-  processing: 'Transcribing and generating AI review… This may take a few minutes.',
+  submitted: 'Uploading…',
+  processing: 'Uploading… This may take a few minutes.',
   complete: 'Done!',
 };
 
