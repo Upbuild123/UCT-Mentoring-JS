@@ -5,6 +5,17 @@ const ffmpegStatic = require('ffmpeg-static');
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
+async function withRetry(fn, maxAttempts = 3) {
+  let lastErr;
+  for (let i = 0; i < maxAttempts; i++) {
+    try { return await fn(); } catch (err) {
+      lastErr = err;
+      if (i < maxAttempts - 1) await new Promise(r => setTimeout(r, 5000 * (i + 1)));
+    }
+  }
+  throw lastErr;
+}
+
 function getClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
@@ -25,12 +36,14 @@ function extractAudio(videoPath, audioPath) {
 }
 
 async function transcribe(audioPath) {
-  const client = getClient();
-  const result = await client.audio.transcriptions.create({
-    model: 'whisper-1',
-    file: fs.createReadStream(audioPath),
+  return withRetry(async () => {
+    const client = getClient();
+    const result = await client.audio.transcriptions.create({
+      model: 'whisper-1',
+      file: fs.createReadStream(audioPath),
+    });
+    return addSpeakerLabels(client, result.text);
   });
-  return addSpeakerLabels(client, result.text);
 }
 
 async function addSpeakerLabels(client, rawTranscript) {
@@ -166,11 +179,13 @@ Developmental Practice:
 
 Base your evaluation entirely on what you observe in the transcript. Do not reference any self-ratings or written reflections submitted separately.`;
 
-  const response = await client.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [{ role: 'user', content: prompt }],
+  return withRetry(async () => {
+    const response = await client.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    return response.choices[0].message.content;
   });
-  return response.choices[0].message.content;
 }
 
 module.exports = { extractAudio, transcribe, generateAiReview };

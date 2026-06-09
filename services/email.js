@@ -7,10 +7,12 @@ function getClient() {
 const FROM = () => process.env.EMAIL_FROM || 'Upbuild Mentoring <mentoring@upbuild.com>';
 const APP_URL = () => process.env.APP_URL || 'http://localhost:3000';
 
-async function sendMentorNotification({ mentorEmail, mentorName, mentorId, studentName, roundNum, videoDriveUrl, assessmentId }) {
+async function sendMentorNotification({ mentorEmail, mentorName, mentorId, studentName, roundNum, videoDriveUrl, assessmentId, mentorToken, dashboardToken }) {
   const mentorFirst = mentorName.split(' ')[0];
   const studentFirst = studentName.split(' ')[0];
   const appUrl = APP_URL();
+  const t = mentorToken ? `&token=${mentorToken}` : '';
+  const dt = dashboardToken ? `&token=${dashboardToken}` : '';
   await getClient().emails.send({
     from: FROM(),
     to: mentorEmail,
@@ -19,11 +21,11 @@ async function sendMentorNotification({ mentorEmail, mentorName, mentorId, stude
 <p>There is a new mentoring recording to review from ${studentFirst}.</p>
 <ul>
   <li><a href="${videoDriveUrl}">Video recording</a></li>
-  <li><a href="${appUrl}/transcript.html?assessment_id=${assessmentId}">Transcript</a></li>
-  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}">AI-generated review</a></li>
+  <li><a href="${appUrl}/transcript.html?assessment_id=${assessmentId}${t}">Transcript</a></li>
+  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI-generated review</a></li>
 </ul>
-<p>After your mentoring meeting, <a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}">submit mentor feedback</a>.</p>
-<p><a href="${appUrl}/mentor-dashboard.html?mentor_id=${mentorId}">View your mentor dashboard</a></p>`,
+<p>After your mentoring meeting, <a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}${t}">submit mentor feedback</a>.</p>
+<p><a href="${appUrl}/mentor-dashboard.html?mentor_id=${mentorId}${dt}">View your mentor dashboard</a></p>`,
   });
 }
 

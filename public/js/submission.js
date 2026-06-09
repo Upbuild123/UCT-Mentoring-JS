@@ -170,7 +170,7 @@ async function pollStatus(assessmentId) {
         clearInterval(interval);
         document.getElementById('progress-area').style.display = 'none';
         document.getElementById('submit-btn').disabled = false;
-        showBanner(document.getElementById('banner-area'), `Processing failed: ${error_message || 'Unknown error'}`);
+        showBanner(document.getElementById('banner-area'), 'Something went wrong with your submission. Please contact your coordinator.');
       }
     } catch {}
   }, 3000);

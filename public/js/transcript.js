@@ -1,21 +1,29 @@
 const params = new URLSearchParams(location.search);
 const assessmentId = params.get('assessment_id');
+const token = params.get('token');
 
-async function init() {
-  const data = await apiFetch(`/api/assessments/${assessmentId}`);
-  document.getElementById('caption').textContent = `${data.students.name} — Round ${data.round}`;
-  document.getElementById('transcript-content').textContent = data.transcript || '(No transcript available)';
-
-  document.getElementById('download-txt').addEventListener('click', () => {
-    const blob = new Blob([data.transcript || ''], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `transcript-${assessmentId}.txt`; a.click();
-    URL.revokeObjectURL(url);
+if (!token) {
+  document.addEventListener('DOMContentLoaded', () => {
+    showBanner(document.getElementById('banner-area'), 'Access denied. Please use the link from your email.');
   });
+} else {
+  async function init() {
+    const data = await apiFetch(`/api/assessments/${assessmentId}?token=${token}`);
+    document.getElementById('caption').textContent = `${data.students.name} — Round ${data.round}`;
+    document.getElementById('transcript-content').textContent = data.transcript || '(No transcript available)';
 
-  document.getElementById('download-docx').href = `/api/assessments/${assessmentId}/transcript/docx`;
-  document.getElementById('download-docx').download = `transcript-${assessmentId}.docx`;
+    document.getElementById('download-txt').addEventListener('click', () => {
+      const blob = new Blob([data.transcript || ''], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `transcript-${assessmentId}.txt`; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    const docxLink = document.getElementById('download-docx');
+    docxLink.href = `/api/assessments/${assessmentId}/transcript/docx?token=${token}`;
+    docxLink.download = `transcript-${assessmentId}.docx`;
+  }
+
+  init();
 }
-
-init();

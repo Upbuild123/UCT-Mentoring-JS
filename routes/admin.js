@@ -4,10 +4,14 @@ const crypto = require('crypto');
 
 const tokens = new Set();
 
-function requireAdmin(req, res, next) {
+function isAdmin(req) {
   const auth = req.headers.authorization || '';
   const token = auth.replace('Bearer ', '');
-  if (!tokens.has(token)) return res.status(401).json({ error: 'Unauthorized' });
+  return tokens.has(token);
+}
+
+function requireAdmin(req, res, next) {
+  if (!isAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
   next();
 }
 
@@ -23,3 +27,4 @@ router.post('/auth', (req, res) => {
 
 module.exports = router;
 module.exports.requireAdmin = requireAdmin;
+module.exports.isAdmin = isAdmin;

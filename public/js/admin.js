@@ -78,9 +78,10 @@ function renderAssessments() {
         <span class="badge ${badgeClass}">${a.status}</span>
         ${a.error_message ? `<span class="text-gray" title="${a.error_message}">⚠ ${a.error_message.slice(0, 60)}</span>` : ''}
         <div style="margin-left:auto;display:flex;gap:6px">
-          <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}">Review</a>
+          <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}${a.mentor_token ? `&token=${a.mentor_token}` : ''}">Review</a>
           ${a.status === 'error' ? `<button class="btn btn-secondary btn-sm" onclick="retryAssessment(${a.id})">Retry</button>` : ''}
           ${a.status === 'complete' ? `<button class="btn btn-secondary btn-sm" onclick="regenerateReview(${a.id})">Regenerate AI Review</button>` : ''}
+          <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteAssessment(${a.id})">Delete</button>
         </div>
       </div>`;
     list.appendChild(card);
@@ -88,13 +89,21 @@ function renderAssessments() {
 }
 
 async function retryAssessment(id) {
+  if (!confirm('Retry processing for this assessment?')) return;
   await apiFetch(`/api/assessments/${id}/retry`, { method: 'POST' });
   await loadAll();
 }
 
 async function regenerateReview(id) {
+  if (!confirm('Regenerate the AI review? This will add a new AI review entry.')) return;
   await apiFetch(`/api/assessments/${id}/regenerate-ai-review`, { method: 'POST' });
   showBanner(document.getElementById('banner-area'), 'AI review regenerated.', 'success');
+}
+
+async function deleteAssessment(id) {
+  if (!confirm('Delete this assessment? This cannot be undone.')) return;
+  await apiFetch(`/api/assessments/${id}`, { method: 'DELETE' });
+  await loadAll();
 }
 
 function renderMentors() {
@@ -114,10 +123,19 @@ function renderMentors() {
           <div class="form-group" style="flex:1"><label>Name</label><input type="text" class="edit-mentor-name" value="${m.name}"></div>
           <div class="form-group" style="flex:1"><label>Email</label><input type="email" class="edit-mentor-email" value="${m.email}"></div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="saveMentor(${m.id}, this)">Save</button>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-primary btn-sm" onclick="saveMentor(${m.id}, this)">Save</button>
+          <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteMentor(${m.id})">Delete</button>
+        </div>
       </div>`;
     list.appendChild(details);
   }
+}
+
+async function deleteMentor(id) {
+  if (!confirm('Delete this mentor? This cannot be undone.')) return;
+  await apiFetch(`/api/mentors/${id}`, { method: 'DELETE' });
+  await loadAll();
 }
 
 async function saveMentor(id, btn) {
@@ -163,9 +181,18 @@ function renderStudents() {
           <select class="edit-student-mentor">${allMentors.map(m => `<option value="${m.id}" ${m.id === s.mentor_id ? 'selected' : ''}>${m.name}</option>`).join('')}</select>
         </div>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="saveStudent(${s.id}, this)">Save</button>`;
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-primary btn-sm" onclick="saveStudent(${s.id}, this)">Save</button>
+        <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteStudent(${s.id})">Delete</button>
+      </div>`;
     list.appendChild(details);
   }
+}
+
+async function deleteStudent(id) {
+  if (!confirm('Delete this student? This cannot be undone.')) return;
+  await apiFetch(`/api/students/${id}`, { method: 'DELETE' });
+  await loadAll();
 }
 
 async function saveStudent(id, btn) {

@@ -15,7 +15,7 @@ async function processAssessment(assessmentId, videoPath) {
   try {
     const { data: assessment } = await supabase
       .from('assessments')
-      .select('*, students(name, email, mentor_id, mentors(name, email, id))')
+      .select('*, students(name, email, mentor_id, mentors(name, email, id, dashboard_token)), ai_reviews(content)')
       .eq('id', assessmentId)
       .single();
 
@@ -23,29 +23,36 @@ async function processAssessment(assessmentId, videoPath) {
     const mentor = student.mentors;
     const baseName = `Mentoring Round ${assessment.round}. ${student.name}`;
 
-    // Step 1: Create Drive folder
-    const { folderId, folderUrl } = await drive.createStudentRoundFolder(
-      student.name, assessment.round, student.email || ''
-    );
-    await updateAssessment(assessmentId, { drive_folder_id: folderId, drive_folder_url: folderUrl });
+    // Step 1: Create Drive folder (skip if already done)
+    let folderId = assessment.drive_folder_id;
+    let folderUrl = assessment.drive_folder_url;
+    if (!folderId) {
+      const result = await drive.createStudentRoundFolder(
+        student.name, assessment.round, student.email || ''
+      );
+      folderId = result.folderId;
+      folderUrl = result.folderUrl;
+      await updateAssessment(assessmentId, { drive_folder_id: folderId, drive_folder_url: folderUrl });
+    }
 
-    // Step 2: Upload video
-    let videoDriveUrl = null;
-    if (videoPath && fs.existsSync(videoPath)) {
+    // Step 2: Upload video (skip if already done)
+    let videoDriveUrl = assessment.video_drive_url;
+    if (!videoDriveUrl && videoPath && fs.existsSync(videoPath)) {
       videoDriveUrl = await drive.uploadFile(videoPath, folderId, `${baseName}. Recording.mp4`);
       await updateAssessment(assessmentId, { video_drive_url: videoDriveUrl });
     }
 
-    // Step 3: Extract audio
+    // Step 3+4: Extract audio + transcribe (skip if transcript already saved)
+    let transcript = assessment.transcript;
     const audioPath = videoPath ? videoPath.replace(/\.[^.]+$/, '.mp3') : null;
-    if (videoPath && fs.existsSync(videoPath)) {
-      await openai.extractAudio(videoPath, audioPath);
-    }
-
-    // Step 4: Transcribe
-    let transcript = '';
-    if (audioPath && fs.existsSync(audioPath)) {
-      transcript = await openai.transcribe(audioPath);
+    if (!transcript) {
+      if (videoPath && fs.existsSync(videoPath)) {
+        await openai.extractAudio(videoPath, audioPath);
+      }
+      if (audioPath && fs.existsSync(audioPath)) {
+        transcript = await openai.transcribe(audioPath);
+        await updateAssessment(assessmentId, { transcript });
+      }
     }
 
     // Cleanup local files
@@ -54,26 +61,27 @@ async function processAssessment(assessmentId, videoPath) {
     }
 
     // Step 5: Upload transcript docx
-    const doc = new Document({
-      sections: [{
-        children: [
-          new Paragraph({ text: `${baseName}. Transcript`, heading: 'Heading1' }),
-          ...transcript.split('\n').map(line => new Paragraph({ text: line })),
-        ],
-      }],
-    });
-    const docBuffer = await Packer.toBuffer(doc);
-    await drive.uploadBuffer(
-      docBuffer, folderId, `${baseName}. Transcript.docx`,
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    );
+    if (transcript) {
+      const doc = new Document({
+        sections: [{
+          children: [
+            new Paragraph({ text: `${baseName}. Transcript`, heading: 'Heading1' }),
+            ...transcript.split('\n').map(line => new Paragraph({ text: line })),
+          ],
+        }],
+      });
+      const docBuffer = await Packer.toBuffer(doc);
+      await drive.uploadBuffer(
+        docBuffer, folderId, `${baseName}. Transcript.docx`,
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      );
+    }
 
-    // Save transcript to DB
-    await updateAssessment(assessmentId, { transcript });
-
-    // Step 6: Generate AI review
-    const aiContent = await openai.generateAiReview(assessment, transcript);
-    await supabase.from('ai_reviews').insert({ assessment_id: assessmentId, content: aiContent });
+    // Step 6: Generate AI review (skip if already exists)
+    if (!assessment.ai_reviews?.length) {
+      const aiContent = await openai.generateAiReview(assessment, transcript || '');
+      await supabase.from('ai_reviews').insert({ assessment_id: assessmentId, content: aiContent });
+    }
 
     // Step 7: Send mentor notification
     await email.sendMentorNotification({
@@ -84,6 +92,8 @@ async function processAssessment(assessmentId, videoPath) {
       roundNum: assessment.round,
       videoDriveUrl: videoDriveUrl || '',
       assessmentId,
+      mentorToken: assessment.mentor_token || '',
+      dashboardToken: mentor.dashboard_token || '',
     });
 
     // Step 8: Send student confirmation

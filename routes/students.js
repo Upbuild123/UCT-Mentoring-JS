@@ -46,6 +46,16 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { error } = await supabase.from('students').delete().eq('id', req.params.id);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/bulk-import', async (req, res, next) => {
   try {
     const { rows } = req.body; // [{ name, email, mentor_name }]

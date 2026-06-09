@@ -1,13 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const crypto = require('crypto');
 const supabase = require('../services/supabase');
 const { processAssessment } = require('../services/processor');
+const { isAdmin, requireAdmin } = require('./admin');
 
 const upload = multer({
   dest: 'uploads/',
   limits: { fileSize: 5 * 1024 * 1024 * 1024 },
 });
+
+async function requireMentorAccess(req, res, next) {
+  if (isAdmin(req)) return next();
+  const token = req.query.token;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const { data } = await supabase.from('assessments').select('mentor_token').eq('id', req.params.id).single();
+  if (!data || data.mentor_token !== token) return res.status(401).json({ error: 'Unauthorized' });
+  next();
+}
+
+async function requireDashboardAccess(req, res, next) {
+  if (isAdmin(req)) return next();
+  const token = req.query.token;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const { data } = await supabase.from('mentors').select('dashboard_token').eq('id', req.params.mentor_id).single();
+  if (!data || data.dashboard_token !== token) return res.status(401).json({ error: 'Unauthorized' });
+  next();
+}
 
 router.get('/check-duplicate', async (req, res, next) => {
   try {
@@ -28,6 +48,7 @@ router.get('/check-duplicate', async (req, res, next) => {
 router.post('/submit', upload.single('video'), async (req, res, next) => {
   try {
     const { student_id, round, competency_ratings, reflections } = req.body;
+    const mentor_token = crypto.randomUUID();
     const { data, error } = await supabase
       .from('assessments')
       .insert({
@@ -36,6 +57,7 @@ router.post('/submit', upload.single('video'), async (req, res, next) => {
         competency_ratings: JSON.parse(competency_ratings),
         reflections: JSON.parse(reflections),
         status: 'submitted',
+        mentor_token,
       })
       .select()
       .single();
@@ -52,7 +74,7 @@ router.post('/submit', upload.single('video'), async (req, res, next) => {
   }
 });
 
-router.get('/all', async (req, res, next) => {
+router.get('/all', requireAdmin, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
@@ -70,7 +92,7 @@ router.get('/all', async (req, res, next) => {
   }
 });
 
-router.get('/by-mentor/:mentor_id', async (req, res, next) => {
+router.get('/by-mentor/:mentor_id', requireDashboardAccess, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
@@ -98,7 +120,7 @@ router.get('/:id/status', async (req, res, next) => {
   }
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', requireMentorAccess, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
@@ -113,7 +135,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.post('/:id/mentor-feedback', async (req, res, next) => {
+router.post('/:id/mentor-feedback', requireMentorAccess, async (req, res, next) => {
   try {
     const { feedback_text, mentor_ratings } = req.body;
     const { error: delErr } = await supabase
@@ -138,7 +160,7 @@ router.post('/:id/mentor-feedback', async (req, res, next) => {
   }
 });
 
-router.post('/:id/retry', async (req, res, next) => {
+router.post('/:id/retry', requireAdmin, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
@@ -162,7 +184,7 @@ router.post('/:id/retry', async (req, res, next) => {
   }
 });
 
-router.post('/:id/regenerate-ai-review', async (req, res, next) => {
+router.post('/:id/regenerate-ai-review', requireAdmin, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
@@ -182,7 +204,17 @@ router.post('/:id/regenerate-ai-review', async (req, res, next) => {
   }
 });
 
-router.get('/:id/transcript/docx', async (req, res, next) => {
+router.delete('/:id', requireAdmin, async (req, res, next) => {
+  try {
+    const { error } = await supabase.from('assessments').delete().eq('id', req.params.id);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/:id/transcript/docx', requireMentorAccess, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
@@ -209,7 +241,7 @@ router.get('/:id/transcript/docx', async (req, res, next) => {
   }
 });
 
-router.get('/:id/ai-review/docx', async (req, res, next) => {
+router.get('/:id/ai-review/docx', requireMentorAccess, async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('assessments')
