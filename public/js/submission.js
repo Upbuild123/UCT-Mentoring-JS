@@ -35,8 +35,20 @@ async function init() {
       const div = document.createElement('div');
       div.className = 'form-group';
       const label = document.createElement('label');
-      label.textContent = comp.name;
       label.setAttribute('for', `rating-${comp.name}`);
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = comp.name;
+      const req = document.createElement('span');
+      req.textContent = ' *';
+      req.style.color = '#d32f2f';
+      label.appendChild(nameSpan);
+      label.appendChild(req);
+      const desc = document.createElement('p');
+      desc.className = 'text-gray';
+      desc.style.margin = '2px 0 6px';
+      desc.style.fontStyle = 'italic';
+      desc.style.fontWeight = 'normal';
+      desc.textContent = comp.description;
       const select = document.createElement('select');
       select.id = `rating-${comp.name}`;
       select.dataset.competency = comp.name;
@@ -47,14 +59,9 @@ async function init() {
         o.textContent = opt;
         select.appendChild(o);
       }
-      const desc = document.createElement('p');
-      desc.className = 'text-gray';
-      desc.style.marginTop = '4px';
-      desc.style.fontStyle = 'italic';
-      desc.textContent = comp.description;
       div.appendChild(label);
-      div.appendChild(select);
       div.appendChild(desc);
+      div.appendChild(select);
       container.appendChild(div);
     }
   }
@@ -64,8 +71,19 @@ async function init() {
     const div = document.createElement('div');
     div.className = 'form-group';
     const label = document.createElement('label');
-    label.textContent = q + (required ? '' : ' (optional)');
-    label.style.color = required ? '' : 'var(--gray)';
+    label.textContent = q;
+    if (required) {
+      const req = document.createElement('span');
+      req.textContent = ' *';
+      req.style.color = '#d32f2f';
+      label.appendChild(req);
+    } else {
+      const opt = document.createElement('span');
+      opt.textContent = ' (optional)';
+      opt.style.color = 'var(--gray)';
+      opt.style.fontWeight = 'normal';
+      label.appendChild(opt);
+    }
     const textarea = document.createElement('textarea');
     textarea.dataset.question = q;
     textarea.className = 'reflection-textarea';
