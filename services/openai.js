@@ -94,11 +94,34 @@ Use this exact structure. Use bold headings only — no large markdown headings 
 
 **Summary**
 
-In 1-3 paragraphs:
-- What was the session really about?
+In 1-2 paragraphs, focused on the COACH (not a recap of the client's situation):
 - What was the coach's overall effectiveness?
 - What stands out most about the coach's style?
-- What appears to be the coach's primary developmental edge?
+- What appears to be the coach's single highest-leverage developmental edge (preview only — detailed below)?
+
+**Dominant Coaching Strategy**
+
+Diagnose the coach's dominant, default strategy in this session — e.g., validation, encouragement, problem-solving, reflection, reassurance, information-giving, etc. A coach can have more than one, but identify the most dominant one or two.
+
+For the dominant strategy:
+- Describe what it looks like in this coach's practice, with specific examples/quotes.
+- Benefits: what this strategy does well for the client and the relationship.
+- Costs: what this strategy tends to crowd out, avoid, or limit when overused.
+
+**Client Agendas**
+
+Based on the transcript, identify:
+
+*Presenting Agenda*
+[The surface-level topic or issue the client brought to the session.]
+
+*Deeper Agenda*
+[The underlying pattern, belief, fear, or dynamic beneath the presenting topic.]
+
+*Potential Transformational Agenda*
+[The identity-level shift or growth edge available to the client, if the coaching went as deep as possible.]
+
+Then assess: at which of these levels was the coach actually working? Was that the appropriate level given where the client was, or did the coach stay shallower (or go deeper) than the client was ready for?
 
 **Meta-Skills**
 
@@ -126,17 +149,7 @@ Identify between 3 and 7 strengths — no fewer than 3, no more than 7. For each
 - How it affected the client.
 - Evidence from the transcript.
 
-Focus on recurring strengths, not isolated moments.
-
-**Developmental Edges**
-
-Identify between 3 and 5 developmental edges. For each:
-
-*[Developmental edge title]*
-- What the coach did.
-- Why it may limit coaching effectiveness.
-- What a more advanced coach might have done.
-- Example questions or approaches that could have deepened the work.
+Focus on recurring strengths — patterns that showed up more than once — not isolated moments.
 
 **Deepest Doorways**
 
@@ -145,39 +158,44 @@ Identify 1-5 moments with the greatest transformational potential. For each:
 - Explain why it mattered.
 - Explain what the coach did.
 - Explain where the coaching might have gone if the coach had stayed there longer.
+- Connect this moment to the coach's broader pattern: is this part of the dominant strategy/habit identified above, or a departure from it?
 
 Focus on moments where identity, values, fear, assumptions, tension, purpose, or meaning emerged.
 
-**Developmental Opportunities and Practices**
+**The Highest-Leverage Developmental Edge**
 
-Identify 1-3 specific coaching behaviors that would most improve this coach's effectiveness based on what occurred in this session.
+Do not list multiple developmental opportunities. Identify ONE single developmental edge — the one that, if shifted, would most improve this coach's effectiveness across sessions, not just this one.
 
-Do NOT recommend books, workshops, courses, certifications, supervision, reflective practice, or other generic professional development activities unless there is a clear and significant knowledge gap.
+Structure:
 
-Each developmental opportunity must:
-- Be directly tied to a specific observation from this session
-- Focus on a coaching behavior, not coaching knowledge
-- Be actionable in the coach's very next session
-- Be phrased as a developmental practice, not an educational recommendation
-- Prioritize high-leverage coaching fundamentals over advanced techniques
-- Use concepts from the Upbuild methodology when relevant
+*Recurring Pattern*
+[Describe the pattern as it showed up repeatedly throughout this session — cite at least 2-3 distinct moments/quotes as evidence, not just one isolated instance.]
 
-For each developmental opportunity use this format:
+*Why It Matters*
+[Why this pattern, if it persists across sessions, caps the coach's growth or the client's depth of work. Connect to the dominant strategy and its costs identified earlier.]
 
-*[Development Opportunity Title]*
+*The Edge*
+[Name the shift in one or two sentences — what would the coach do differently.]
 
-Observation:
-[What specifically happened in the session.]
+**One Practice to Carry Forward**
 
-Why It Matters:
-[Why this limits coaching effectiveness.]
+Replace generic suggestions with ONE concrete behavioral practice the coach can apply across the next several sessions (not just the next one). It should be specific enough that the coach knows exactly what to do differently in the moment.
 
-Developmental Practice:
-[A concrete, specific practice the coach can implement in their next session — phrased as an action, not a recommendation to study or learn.]
+Do NOT recommend books, workshops, courses, certifications, supervision, or other generic professional development activities.
+
+Structure:
+
+*The Practice*
+[A specific, repeatable in-session behavior — phrased as an action, e.g., "When the client X, do Y instead of Z."]
+
+*Success Metric*
+[What a mentor could observe across future session recordings/transcripts that would indicate the coach is making this shift — be concrete enough to actually check for.]
 
 ---
 
-Base your evaluation entirely on what you observe in the transcript. Do not reference any self-ratings or written reflections submitted separately.`;
+Base your evaluation entirely on what you observe in the transcript. Do not reference any self-ratings or written reflections submitted separately.
+
+Formatting: Write in clear, well-spaced prose and bullet points. Use a blank line between every paragraph, heading, and bullet list so the document is easy to scan — never run sections together.`;
 
   return withRetry(async () => {
     const response = await client.chat.completions.create({

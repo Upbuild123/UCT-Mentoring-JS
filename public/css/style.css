@@ -115,6 +115,19 @@ textarea { min-height: 90px; resize: vertical; }
 .alert-success { background: #D4EDDA; border: 1px solid #28A745; }
 .alert-error { background: #F8D7DA; border: 1px solid #dc3545; color: #721C24; }
 
+#review-content p,
+#review-content ul,
+#review-content ol {
+  margin-bottom: 14px;
+}
+#review-content li {
+  margin-bottom: 6px;
+}
+#review-content strong {
+  display: inline-block;
+  margin-top: 10px;
+}
+
 .divider {
   border: none;
   border-top: 1px solid var(--border);
