@@ -233,8 +233,9 @@ router.get('/:id/transcript/docx', requireMentorAccess, async (req, res, next) =
       }],
     });
     const buffer = await Packer.toBuffer(doc);
+    const filename = `Mentoring Round ${data.round}. ${data.students.name}. Transcript.docx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    res.setHeader('Content-Disposition', `attachment; filename="transcript-${req.params.id}.docx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   } catch (err) {
     next(err);

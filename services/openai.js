@@ -54,7 +54,7 @@ async function addSpeakerLabels(client, rawTranscript) {
       content: `Below is a raw transcript of a coaching session between a coach and their client.\n\nReformat it with speaker labels on each turn. Use exactly "Coach:" and "Client:" as labels.\n- The coach typically asks questions, reflects back, and facilitates exploration.\n- The client shares their experience, challenges, and goals.\n\nReturn only the formatted transcript — no commentary, no preamble.\n\nRaw transcript:\n${rawTranscript}`,
     }],
   });
-  return response.choices[0].message.content;
+  return response.choices[0].message.content.trim().replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/, '');
 }
 
 async function generateAiReview(assessment, transcript) {
