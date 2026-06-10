@@ -136,8 +136,11 @@ function renderMentors() {
     details.innerHTML = `
       <summary>${m.name} — ${m.email}</summary>
       <div style="margin-top:12px">
-        <p class="text-gray">Students: ${myStudents.map(s => s.name).join(', ') || 'None'}</p>
-        <p class="text-gray mt-16">Dashboard: <a href="${appUrl}/mentor-dashboard.html?mentor_id=${m.id}&token=${m.dashboard_token || ''}" target="_blank">${appUrl}/mentor-dashboard.html?mentor_id=${m.id}&token=${m.dashboard_token || ''}</a></p>
+        ${myStudents.length ? `<p class="text-gray">Students: ${myStudents.map(s => s.name).join(', ')}</p>` : ''}
+        <p class="text-gray mt-16">
+          <a class="btn btn-secondary btn-sm" href="${appUrl}/mentor-dashboard.html?mentor_id=${m.id}&token=${m.dashboard_token || ''}" target="_blank">Open Dashboard</a>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="copyDashboardLink(${m.id}, '${m.dashboard_token || ''}')">Copy Link</button>
+        </p>
         <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
           <div class="form-group" style="flex:1"><label>Name</label><input type="text" class="edit-mentor-name" value="${m.name}"></div>
           <div class="form-group" style="flex:1"><label>Email</label><input type="email" class="edit-mentor-email" value="${m.email}"></div>
@@ -149,6 +152,12 @@ function renderMentors() {
       </div>`;
     list.appendChild(details);
   }
+}
+
+function copyDashboardLink(mentorId, token) {
+  const url = `${window.location.origin}/mentor-dashboard.html?mentor_id=${mentorId}&token=${token}`;
+  navigator.clipboard.writeText(url);
+  showBanner(document.getElementById('banner-area'), 'Dashboard link copied.', 'success');
 }
 
 async function deleteMentor(id) {
