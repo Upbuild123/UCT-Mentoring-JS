@@ -251,7 +251,7 @@ function renderOverview() {
   const sorted = [...allStudents].sort((a, b) => a.name.localeCompare(b.name));
   for (const s of sorted) {
     const mentorName = allMentors.find(m => m.id === s.mentor_id)?.name || '—';
-    const rounds = allAssessments.filter(a => a.student_id === s.id).length;
+    const rounds = allAssessments.filter(a => a.student_id === s.id && a.status === 'complete').length;
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${s.name}</td><td>${mentorName}</td><td>${rounds}</td>`;
     tbody.appendChild(tr);
@@ -259,11 +259,11 @@ function renderOverview() {
 }
 
 function exportOverviewCsv() {
-  const rows = [['Student', 'Mentor', 'Rounds Submitted']];
+  const rows = [['Student', 'Mentor', 'Rounds Completed']];
   const sorted = [...allStudents].sort((a, b) => a.name.localeCompare(b.name));
   for (const s of sorted) {
     const mentorName = allMentors.find(m => m.id === s.mentor_id)?.name || '';
-    const rounds = allAssessments.filter(a => a.student_id === s.id).length;
+    const rounds = allAssessments.filter(a => a.student_id === s.id && a.status === 'complete').length;
     rows.push([s.name, mentorName, rounds]);
   }
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
