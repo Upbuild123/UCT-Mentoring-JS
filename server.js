@@ -28,7 +28,10 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+  const server = app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+  // Allow long-running uploads of large video files on slow connections
+  server.requestTimeout = 30 * 60 * 1000;
+  server.headersTimeout = 30 * 60 * 1000;
 }
 
 module.exports = app;
