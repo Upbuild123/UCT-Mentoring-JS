@@ -262,8 +262,9 @@ router.get('/:id/ai-review/docx', requireMentorAccess, async (req, res, next) =>
       }],
     });
     const buffer = await Packer.toBuffer(doc);
+    const filename = `Mentoring Round ${data.round}. ${data.students.name}. AI Review.docx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    res.setHeader('Content-Disposition', `attachment; filename="ai-review-${req.params.id}.docx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   } catch (err) {
     next(err);

@@ -14,17 +14,19 @@ if (!token) {
     const content = data.ai_reviews?.[0]?.content || '(No AI review available)';
     document.getElementById('review-content').innerHTML = marked.parse(content);
 
+    const baseName = `Mentoring Round ${data.round}. ${data.students.name}. AI Review`;
+
     document.getElementById('download-txt').addEventListener('click', () => {
       const blob = new Blob([content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `ai-review-${assessmentId}.txt`; a.click();
+      a.href = url; a.download = `${baseName}.txt`; a.click();
       URL.revokeObjectURL(url);
     });
 
     const docxLink = document.getElementById('download-docx');
     docxLink.href = `/api/assessments/${assessmentId}/ai-review/docx?token=${token}`;
-    docxLink.download = `ai-review-${assessmentId}.docx`;
+    docxLink.download = `${baseName}.docx`;
   }
 
   init();
