@@ -199,10 +199,33 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
   document.getElementById('submit-btn').disabled = true;
   document.getElementById('progress-area').style.display = 'block';
+  const progressMsg = document.getElementById('progress-msg');
+  progressMsg.textContent = 'Uploading… 0%';
 
   try {
-    const res = await fetch('/api/assessments/submit', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error((await res.json()).error || 'Submission failed');
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/assessments/submit');
+      xhr.upload.addEventListener('progress', e => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          progressMsg.textContent = pct < 100
+            ? `Uploading… ${pct}%`
+            : 'Upload complete. Finishing up…';
+        }
+      });
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve();
+        } else {
+          let message = 'Submission failed';
+          try { message = JSON.parse(xhr.responseText).error || message; } catch {}
+          reject(new Error(message));
+        }
+      };
+      xhr.onerror = () => reject(new Error('Network error during upload. Please check your connection and try again.'));
+      xhr.send(formData);
+    });
     localStorage.removeItem(DRAFT_KEY);
     document.getElementById('progress-area').style.display = 'none';
     const successArea = document.getElementById('success-area');
