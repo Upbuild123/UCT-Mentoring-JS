@@ -95,7 +95,7 @@ function renderAssessments() {
         <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
           <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}${t}">Review</a>
           ${a.transcript || a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/transcript.html?assessment_id=${a.id}${t}" target="_blank">Transcript</a>` : ''}
-          ${a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/ai-review.html?assessment_id=${a.id}${t}" target="_blank">AI Review</a>` : ''}
+          ${a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/ai-review.html?assessment_id=${a.id}${t}" target="_blank">AI Generated Analysis</a>` : ''}
           ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">PDF</a>` : ''}
           ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
           ${a.status === 'error' ? `<button class="btn btn-secondary btn-sm" onclick="retryAssessment(${a.id})">Retry</button>` : ''}

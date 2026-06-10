@@ -22,7 +22,7 @@ async function sendMentorNotification({ mentorEmail, mentorName, mentorId, stude
 <ul>
   <li><a href="${videoDriveUrl}">Video recording</a></li>
   <li><a href="${appUrl}/transcript.html?assessment_id=${assessmentId}${t}">Transcript</a></li>
-  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI-generated review</a></li>
+  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI Generated Analysis</a></li>
 </ul>
 <p>After your mentoring meeting, <a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}${t}">submit mentor feedback</a>.</p>
 <p><a href="${appUrl}/mentor-dashboard.html?mentor_id=${mentorId}${dt}">View your mentor dashboard</a></p>`,
@@ -76,7 +76,7 @@ async function sendMentorReminder({ mentorEmail, mentorName, studentName, roundN
 <p>This is a reminder that ${studentFirst} is waiting for your feedback on their Round ${roundNum} coaching session.</p>
 <ul>
   <li><a href="${appUrl}/transcript.html?assessment_id=${assessmentId}${t}">Transcript</a></li>
-  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI-generated review</a></li>
+  <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI Generated Analysis</a></li>
 </ul>
 <p><a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}${t}">Submit your feedback</a></p>
 <p><a href="${appUrl}/mentor-dashboard.html?mentor_id=${mentorId}${dt}">View your mentor dashboard</a></p>`,
