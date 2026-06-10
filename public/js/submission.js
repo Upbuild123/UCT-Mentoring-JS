@@ -238,33 +238,4 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   }
 });
 
-const statusMessages = {
-  submitted: 'Uploading…',
-  processing: 'Uploading… This may take a few minutes.',
-  complete: 'Done!',
-};
-
-async function pollStatus(assessmentId) {
-  const msg = document.getElementById('progress-msg');
-  const interval = setInterval(async () => {
-    try {
-      const { status, error_message } = await apiFetch(`/api/assessments/${assessmentId}/status`);
-      msg.textContent = statusMessages[status] || 'Processing…';
-      if (status === 'complete') {
-        clearInterval(interval);
-        localStorage.removeItem(DRAFT_KEY);
-        document.getElementById('progress-area').style.display = 'none';
-        const successArea = document.getElementById('success-area');
-        successArea.style.display = 'block';
-        successArea.textContent = 'Your recording has been submitted successfully. Your mentor has been notified.';
-      } else if (status === 'error') {
-        clearInterval(interval);
-        document.getElementById('progress-area').style.display = 'none';
-        document.getElementById('submit-btn').disabled = false;
-        showBanner(document.getElementById('submit-error-area'), 'Something went wrong with your submission. Please contact your coordinator.');
-      }
-    } catch {}
-  }, 3000);
-}
-
 init();
