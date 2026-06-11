@@ -89,12 +89,13 @@ if (!token) {
     }
 
     const reflContainer = document.getElementById('coach-reflections');
-    for (const [q, a] of Object.entries(data.reflections || {})) {
+    Object.entries(data.reflections || {}).forEach(([q, a], i) => {
       const div = document.createElement('div');
       div.className = 'card';
-      div.innerHTML = `<label style="margin-bottom:6px">${q}</label><p style="color:var(--text-soft)">${a || '(no answer)'}</p>`;
+      const fontSize = i < 2 ? '1.5em' : i >= 3 ? '0.5em' : '1em';
+      div.innerHTML = `<label style="margin-bottom:6px">${q}</label><p style="color:var(--text-soft);font-size:${fontSize}">${a || '(no answer)'}</p>`;
       reflContainer.appendChild(div);
-    }
+    });
 
     const existingFeedback = data.mentor_feedback?.[0]?.feedback_text || {};
     const feedbackContainer = document.getElementById('mentor-feedback-fields');

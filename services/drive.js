@@ -58,6 +58,15 @@ async function shareFolder(drive, folderId, email) {
   });
 }
 
+const MENTOR_EMAILS = [
+  'gina@upbuild.com',
+  'michael@upbuild.com',
+  'tzipi@upbuild.com',
+  'mary@upbuild.com',
+  'vipin@upbuild.com',
+  'melissa@upbuild.com',
+];
+
 async function createStudentRoundFolder(studentName, round, studentEmail = '') {
   const drive = await getDrive();
   const parentId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
@@ -70,6 +79,12 @@ async function createStudentRoundFolder(studentName, round, studentEmail = '') {
 
   if (isNew && studentEmail) {
     await shareFolder(drive, studentFolderId, studentEmail);
+  }
+
+  if (isNew) {
+    for (const email of MENTOR_EMAILS) {
+      await shareFolder(drive, studentFolderId, email);
+    }
   }
 
   const roundFolderId = await createFolder(drive, `Round ${round}`, studentFolderId);
