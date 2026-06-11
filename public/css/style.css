@@ -278,8 +278,29 @@ input[type=radio], input[type=checkbox] {
   padding: var(--space-6);
   margin-bottom: var(--space-4);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition), border-color var(--transition);
+  transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition);
 }
+
+#assessments-list .card:hover,
+#mentors-list .card:hover,
+#students-list .card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border);
+}
+
+/* ============================================================
+   Loading state
+   ============================================================ */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border-soft);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+  margin: var(--space-12) auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ============================================================
    Badges & status

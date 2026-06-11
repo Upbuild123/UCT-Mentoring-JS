@@ -23,6 +23,7 @@ document.getElementById('admin-password').addEventListener('keydown', e => {
 function showAdmin() {
   document.getElementById('auth-modal').style.display = 'none';
   document.getElementById('admin-main').style.display = 'block';
+  document.getElementById('assessments-list').innerHTML = '<div class="spinner"></div>';
   loadAll();
 }
 
