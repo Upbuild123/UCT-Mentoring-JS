@@ -9,20 +9,23 @@
 <body>
   <header><a href="/"><img src="/images/upbuild-logo.png" alt="Upbuild" class="logo-img"></a></header>
 
-  <div id="auth-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100">
-    <div class="card" style="width:340px">
-      <h2 style="margin-bottom:16px">Admin Login</h2>
+  <div id="auth-modal" class="modal-overlay">
+    <div class="card">
+      <h2 style="margin:0 0 16px">Admin Login</h2>
       <div class="form-group">
         <label for="admin-password">Password</label>
         <input type="password" id="admin-password">
       </div>
-      <button class="btn btn-primary" id="auth-btn">Login</button>
+      <button class="btn btn-primary" id="auth-btn" style="width:100%">Login</button>
       <div id="auth-error" class="alert alert-error mt-16" style="display:none"></div>
     </div>
   </div>
 
   <main class="wide" id="admin-main" style="display:none">
-    <h1>Admin Dashboard</h1>
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p class="text-gray">Manage assessments, mentors, and students.</p>
+    </div>
     <div id="banner-area"></div>
 
     <div class="tabs">
@@ -33,7 +36,7 @@
     </div>
 
     <div id="tab-assessments">
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+      <div class="flex-row mb-16">
         <select id="status-filter" style="width:160px">
           <option value="">All statuses</option>
           <option value="submitted">Submitted</option>
@@ -49,7 +52,7 @@
     <div id="tab-mentors" style="display:none">
       <div id="mentors-list"></div>
       <div class="card">
-        <h2>Add Mentor</h2>
+        <h2 style="margin-top:0">Add Mentor</h2>
         <div class="form-group"><label>Name</label><input type="text" id="new-mentor-name"></div>
         <div class="form-group"><label>Email</label><input type="email" id="new-mentor-email"></div>
         <button class="btn btn-primary" id="add-mentor-btn">Add Mentor</button>
@@ -59,14 +62,14 @@
     <div id="tab-students" style="display:none">
       <div id="students-list"></div>
       <div class="card">
-        <h2>Bulk Import</h2>
+        <h2 style="margin-top:0">Bulk Import</h2>
         <p class="text-gray mb-16">Paste tab-separated rows: Name &tab; Email &tab; Mentor Name</p>
         <textarea id="bulk-import-text" style="min-height:120px;font-family:monospace"></textarea>
         <button class="btn btn-secondary" id="bulk-import-btn" style="margin-top:8px">Import</button>
         <div id="bulk-result" class="text-gray mt-16"></div>
       </div>
       <div class="card">
-        <h2>Add Student</h2>
+        <h2 style="margin-top:0">Add Student</h2>
         <div class="form-group"><label>Name</label><input type="text" id="new-student-name"></div>
         <div class="form-group"><label>Email</label><input type="email" id="new-student-email"></div>
         <div class="form-group"><label>Mentor</label><select id="new-student-mentor"></select></div>
@@ -78,14 +81,16 @@
       <div style="margin-bottom:12px">
         <button class="btn btn-secondary btn-sm" onclick="exportOverviewCsv()">Export CSV</button>
       </div>
-      <table id="overview-table">
-        <thead><tr><th>Student</th><th>Mentor</th><th>Rounds Completed</th></tr></thead>
-        <tbody id="overview-body"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table id="overview-table">
+          <thead><tr><th>Student</th><th>Mentor</th><th>Rounds Completed</th></tr></thead>
+          <tbody id="overview-body"></tbody>
+        </table>
+      </div>
     </div>
   </main>
 
-  <script src="/js/api.js"></script>
-  <script src="/js/admin.js"></script>
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/admin.js?v=2"></script>
 </body>
 </html>

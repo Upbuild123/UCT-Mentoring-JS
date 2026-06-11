@@ -9,25 +9,30 @@
 <body>
   <header><a href="/"><img src="/images/upbuild-logo.png" alt="Upbuild" class="logo-img"></a></header>
   <main>
-    <h1 id="page-title">Mentor Review</h1>
+    <div class="page-header">
+      <h1 id="page-title">Mentor Review</h1>
+      <p class="text-gray">Compare self-ratings, review reflections, and add your feedback.</p>
+    </div>
     <div id="banner-area"></div>
     <div id="content" style="display:none">
-      <table id="ratings-table">
-        <thead>
-          <tr><th>Competency</th><th>Coach's Rating</th><th>Your Rating</th></tr>
-        </thead>
-        <tbody id="ratings-body"></tbody>
-      </table>
+      <h2 style="margin-top:0">Competency Ratings</h2>
+      <div class="table-wrapper">
+        <table id="ratings-table">
+          <thead>
+            <tr><th>Competency</th><th>Coach's Rating</th><th>Your Rating</th></tr>
+          </thead>
+          <tbody id="ratings-body"></tbody>
+        </table>
+      </div>
 
-      <hr class="divider">
       <h2>Coach's Reflections</h2>
       <div id="coach-reflections"></div>
 
       <hr class="divider">
-      <h2>Your Feedback</h2>
+      <h2 style="margin-top:0">Your Feedback</h2>
       <div id="mentor-feedback-fields"></div>
 
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div class="flex-row">
         <button class="btn btn-primary" id="submit-btn">Submit Feedback</button>
         <button class="btn btn-secondary" id="save-draft-btn">Save Draft</button>
         <span id="draft-saved" style="display:none;color:var(--gray);font-size:13px">Draft saved</span>
@@ -35,7 +40,7 @@
       <div id="submit-success" class="alert alert-success mt-16" style="display:none"></div>
     </div>
   </main>
-  <script src="/js/api.js"></script>
-  <script src="/js/mentor-review.js"></script>
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/mentor-review.js?v=2"></script>
 </body>
 </html>

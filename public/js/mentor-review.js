@@ -69,7 +69,7 @@ if (!token) {
       if (comp.category !== currentCategory) {
         currentCategory = comp.category;
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="3" style="background:var(--light-purple);font-weight:700;color:var(--purple)">${currentCategory}</td>`;
+        tr.innerHTML = `<td colspan="3" style="background:var(--light-purple);font-weight:700;color:var(--purple-dark)">${currentCategory}</td>`;
         tbody.appendChild(tr);
       }
       const tr = document.createElement('tr');
@@ -91,8 +91,8 @@ if (!token) {
     const reflContainer = document.getElementById('coach-reflections');
     for (const [q, a] of Object.entries(data.reflections || {})) {
       const div = document.createElement('div');
-      div.className = 'form-group';
-      div.innerHTML = `<label style="font-weight:700">${q}</label><p style="margin-top:4px;color:#333">${a || '(no answer)'}</p>`;
+      div.className = 'card';
+      div.innerHTML = `<label style="margin-bottom:6px">${q}</label><p style="color:var(--text-soft)">${a || '(no answer)'}</p>`;
       reflContainer.appendChild(div);
     }
 

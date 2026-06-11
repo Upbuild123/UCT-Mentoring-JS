@@ -9,16 +9,19 @@
 <body>
   <header></header>
   <main>
-    <div style="text-align:center;margin-bottom:12px"><img src="/images/upbuild-logo.png" alt="Upbuild" style="height:48px;width:auto"></div>
-    <p id="caption" class="text-gray" style="text-align:center"></p>
-    <hr class="divider">
-    <div style="display:flex;gap:8px;margin-bottom:20px">
+    <div class="page-header">
+      <img class="brand-mark" src="/images/upbuild-logo.png" alt="Upbuild">
+      <h1 style="font-size:22px">Session Transcript</h1>
+      <p id="caption" class="text-gray"></p>
+    </div>
+    <div class="flex-row mb-16">
       <button class="btn btn-secondary btn-sm" id="download-txt">Download .txt</button>
       <a class="btn btn-secondary btn-sm" id="download-docx">Download .docx</a>
     </div>
-    <pre id="transcript-content" style="white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.7"></pre>
+    <hr class="divider">
+    <pre id="transcript-content" style="white-space:pre-wrap;font-family:inherit"></pre>
   </main>
-  <script src="/js/api.js"></script>
-  <script src="/js/transcript.js"></script>
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/transcript.js?v=2"></script>
 </body>
 </html>

@@ -21,14 +21,32 @@ if (!token) {
     myStudents.sort((a, b) => a.name.localeCompare(b.name));
 
     const container = document.getElementById('students-list');
+
+    if (myStudents.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">&#128101;</div><p>No students assigned yet.</p></div>`;
+      return;
+    }
+
     for (const student of myStudents) {
       const studentAssessments = assessments.filter(a => a.student_id === student.id);
       studentAssessments.sort((a, b) => a.round - b.round);
 
+      const pendingCount = studentAssessments.filter(a => {
+        const hasFeedback = Array.isArray(a.mentor_feedback) ? a.mentor_feedback.length > 0 : !!a.mentor_feedback;
+        return !hasFeedback;
+      }).length;
+
       const details = document.createElement('details');
       details.className = 'card';
       const summary = document.createElement('summary');
-      summary.textContent = `${student.name} — ${studentAssessments.length} round${studentAssessments.length !== 1 ? 's' : ''} submitted`;
+      summary.style.display = 'flex';
+      summary.style.alignItems = 'center';
+      summary.style.justifyContent = 'space-between';
+      summary.style.gap = '12px';
+      summary.innerHTML = `
+        <span>${student.name} <span class="text-gray" style="font-weight:500">— ${studentAssessments.length} round${studentAssessments.length !== 1 ? 's' : ''}</span></span>
+        ${pendingCount > 0 ? `<span class="badge badge-orange">${pendingCount} awaiting feedback</span>` : (studentAssessments.length > 0 ? '<span class="badge badge-green">All caught up</span>' : '')}
+      `;
       details.appendChild(summary);
 
       if (studentAssessments.length === 0) {
@@ -38,6 +56,8 @@ if (!token) {
         p.textContent = 'No submissions yet.';
         details.appendChild(p);
       } else {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-wrapper';
         const table = document.createElement('table');
         table.innerHTML = '<thead><tr><th>Round</th><th>Date</th><th>Feedback Status</th><th>Links</th></tr></thead>';
 
@@ -61,7 +81,8 @@ if (!token) {
           tbody.appendChild(tr);
         }
         table.appendChild(tbody);
-        details.appendChild(table);
+        wrapper.appendChild(table);
+        details.appendChild(wrapper);
       }
 
       container.appendChild(details);

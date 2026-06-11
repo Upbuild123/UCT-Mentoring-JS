@@ -1,29 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap');
+
+/* ============================================================
+   Design tokens
+   ============================================================ */
 :root {
+  /* Brand */
   --purple: #5E328C;
-  --light-purple: #EDE7F6;
-  --text: #1E1E1E;
-  --gray: #787878;
-  --border: #E0E0E0;
+  --purple-dark: #4A2570;
+  --light-purple: #F1ECFA;
+  --gold: #B08D57;
+  --gold-light: #FBF4E8;
+
+  /* Neutrals (warm) */
+  --text: #2A2433;
+  --text-soft: #5A5460;
+  --gray: #847E8C;
+  --border: #E8E2E8;
+  --border-soft: #F0EBF0;
+  --surface: #FFFFFF;
+  --bg: #FBF9FB;
+
+  /* Status */
+  --green: #1F7A4D;
+  --green-bg: #E6F4EC;
+  --orange: #92600C;
+  --orange-bg: #FCF1DD;
+  --red: #B3261E;
+  --red-bg: #FBEAE9;
+
+  /* Type */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(42, 36, 51, 0.05);
+  --shadow-md: 0 4px 16px rgba(42, 36, 51, 0.07);
+  --shadow-lg: 0 12px 32px rgba(42, 36, 51, 0.10);
+
+  --transition: 150ms ease;
 }
 
+/* ============================================================
+   Base
+   ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { -webkit-font-smoothing: antialiased; }
+
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #fff;
+  font-family: var(--font-body);
+  background: var(--bg);
   color: var(--text);
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+a { color: var(--purple); }
+a:hover { color: var(--purple-dark); }
+
+::selection { background: var(--light-purple); color: var(--purple-dark); }
+
+:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
 header {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  padding: 10px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  padding: var(--space-4) var(--space-6);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
+
+header:empty { display: none; }
+
+header a { display: block; line-height: 0; }
 
 .logo {
   background: var(--purple);
@@ -31,129 +108,390 @@ header {
   font-weight: 700;
   font-size: 16px;
   padding: 6px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   text-decoration: none;
 }
 
 .logo-img {
-  height: 48px;
+  height: 36px;
   width: auto;
   display: block;
 }
 
+/* ============================================================
+   Layout
+   ============================================================ */
 main {
   max-width: 800px;
-  margin: 40px auto;
-  padding: 0 24px;
+  margin: var(--space-10) auto;
+  padding: 0 var(--space-6);
 }
 
-main.wide { max-width: 1100px; }
+main.wide { max-width: 1140px; }
 
-h1 { font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--purple); }
-h2 { font-size: 16px; font-weight: 700; margin: 24px 0 12px; color: var(--purple); }
+.page-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
 
-label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+.page-header img.brand-mark {
+  height: 40px;
+  width: auto;
+  margin: 0 auto var(--space-4);
+  display: block;
+}
+
+.page-header h1 { margin-bottom: var(--space-2); }
+.page-header p { margin: 0; }
+
+main.wide .page-header { text-align: left; }
+main.wide .page-header img.brand-mark { margin: 0 0 var(--space-3); }
+
+/* ============================================================
+   Typography
+   ============================================================ */
+h1 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: var(--space-6);
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  margin: var(--space-8) 0 var(--space-3);
+  color: var(--purple-dark);
+  letter-spacing: -0.005em;
+}
+
+/* ============================================================
+   Forms
+   ============================================================ */
+label { display: block; font-weight: 600; margin-bottom: var(--space-2); font-size: 14px; }
 
 input[type=text], input[type=email], input[type=password], select, textarea {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
   font-size: 14px;
   font-family: inherit;
   color: var(--text);
+  background: var(--surface);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-textarea { min-height: 90px; resize: vertical; }
+input[type=text]:hover, input[type=email]:hover, input[type=password]:hover, select:hover, textarea:hover {
+  border-color: #C9BFC9;
+}
 
-.form-group { margin-bottom: 18px; }
+input[type=text]:focus, input[type=email]:focus, input[type=password]:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px var(--light-purple);
+}
 
+textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+
+.form-group { margin-bottom: var(--space-5); }
+
+/* Radio / checkbox rows */
+.radio-row {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+}
+.radio-row label,
+.checkbox-row label {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+input[type=radio], input[type=checkbox] {
+  accent-color: var(--purple);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.required-mark { color: var(--red); }
+.optional-mark { color: var(--gray); font-weight: 400; }
+
+.field-hint {
+  margin: 2px 0 var(--space-2);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gray);
+  font-size: 13px;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
 .btn {
-  display: inline-block;
-  padding: 10px 22px;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 24px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   border: none;
   text-decoration: none;
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition), border-color var(--transition);
+  min-height: 42px;
+  font-family: inherit;
 }
 
-.btn-primary { background: var(--purple); color: #fff; }
-.btn-primary:hover { background: #4d2873; }
-.btn-secondary { background: #f0f0f0; color: var(--text); }
-.btn-danger { background: #dc3545; color: #fff; }
-.btn-sm { padding: 6px 14px; font-size: 13px; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+.btn-primary { background: var(--purple); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary:hover:not(:disabled) { background: var(--purple-dark); box-shadow: var(--shadow-md); }
+
+.btn-secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--bg); border-color: #C9BFC9; }
+
+.btn-danger { background: #fff; color: var(--red); border: 1px solid #F1CFCD; }
+.btn-danger:hover:not(:disabled) { background: var(--red-bg); border-color: var(--red); }
+
+.btn-sm { padding: 6px 14px; font-size: 13px; min-height: 32px; }
+
+/* ============================================================
+   Cards
+   ============================================================ */
 .card {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), border-color var(--transition);
 }
 
+/* ============================================================
+   Badges & status
+   ============================================================ */
 .badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
-.badge-green { background: #D4EDDA; color: #155724; }
-.badge-orange { background: #FFF3CD; color: #856404; }
-.badge-red { background: #F8D7DA; color: #721C24; }
-.badge-gray { background: #E9ECEF; color: #495057; }
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-orange { background: var(--orange-bg); color: var(--orange); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-gray { background: var(--border-soft); color: var(--text-soft); }
 
+/* ============================================================
+   Alerts
+   ============================================================ */
 .alert {
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 16px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
   font-size: 14px;
+  border: 1px solid transparent;
+  line-height: 1.5;
 }
-.alert-warning { background: #FFF3CD; border: 1px solid #FFCA2C; }
-.alert-success { background: #D4EDDA; border: 1px solid #28A745; }
-.alert-error { background: #F8D7DA; border: 1px solid #dc3545; color: #721C24; }
+.alert-warning { background: var(--gold-light); border-color: #EFDFC2; color: #7A5A1E; }
+.alert-success { background: var(--green-bg); border-color: #C8E8D5; color: var(--green); }
+.alert-error { background: var(--red-bg); border-color: #F1CFCD; color: var(--red); }
 
+/* ============================================================
+   Review / long-form content
+   ============================================================ */
+#review-content,
+#transcript-content {
+  font-size: 15px;
+  line-height: 1.75;
+}
 #review-content p,
 #review-content ul,
 #review-content ol {
-  margin-bottom: 14px;
+  margin-bottom: var(--space-4);
 }
 #review-content li {
-  margin-bottom: 6px;
+  margin-bottom: var(--space-2);
+}
+#review-content h1,
+#review-content h2,
+#review-content h3 {
+  margin-top: var(--space-8);
 }
 #review-content strong {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: var(--space-2);
 }
 
+/* ============================================================
+   Misc utilities
+   ============================================================ */
 .divider {
   border: none;
-  border-top: 1px solid var(--border);
-  margin: 24px 0;
+  border-top: 1px solid var(--border-soft);
+  margin: var(--space-6) 0;
 }
 
 .text-gray { color: var(--gray); font-size: 13px; }
 .mt-16 { margin-top: 16px; }
 .mb-16 { margin-bottom: 16px; }
 
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th { background: var(--light-purple); color: var(--purple); font-weight: 700; padding: 8px 12px; text-align: left; }
-td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
-tr:nth-child(even) td { background: #FAFAFA; }
+.flex-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
 
-.tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+/* ============================================================
+   Tables
+   ============================================================ */
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { background: var(--light-purple); color: var(--purple-dark); font-weight: 700; padding: 12px 16px; text-align: left; white-space: nowrap; }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border-soft); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+
+.table-wrapper table { border: none; border-radius: 0; }
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: var(--space-6); gap: var(--space-1); overflow-x: auto; }
 .tab {
-  padding: 10px 20px;
+  padding: var(--space-3) var(--space-5);
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
   color: var(--gray);
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  margin-bottom: -1px;
+  transition: color var(--transition), border-color var(--transition);
+  white-space: nowrap;
 }
+.tab:hover { color: var(--purple-dark); }
 .tab.active { color: var(--purple); border-bottom-color: var(--purple); }
 
-details summary { cursor: pointer; font-weight: 600; padding: 12px 0; user-select: none; }
+/* ============================================================
+   Disclosure (details/summary)
+   ============================================================ */
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: var(--space-1) 0;
+  user-select: none;
+  transition: color var(--transition);
+  list-style: none;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: var(--space-2);
+  color: var(--gray);
+  transition: transform var(--transition);
+  font-size: 12px;
+}
+details[open] summary::before { transform: rotate(90deg); }
 details summary:hover { color: var(--purple); }
+details[open] summary { margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border-soft); }
+details .table-wrapper { margin-top: var(--space-1); }
+
+/* ============================================================
+   Empty states
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--gray);
+}
+.empty-state .empty-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-3);
+  opacity: 0.6;
+}
+.empty-state p { font-size: 14px; }
+
+/* ============================================================
+   Modal
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 36, 51, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+}
+.modal-overlay .card {
+  width: 100%;
+  max-width: 360px;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   Progress
+   ============================================================ */
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--border-soft);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: var(--space-2);
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--purple);
+  border-radius: var(--radius-pill);
+  transition: width 200ms ease;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 640px) {
+  main { margin: var(--space-6) auto; padding: 0 var(--space-4); }
+  main.wide { padding: 0 var(--space-3); }
+  h1 { font-size: 24px; }
+  header { padding: var(--space-3) var(--space-4); }
+  .card { padding: var(--space-4); border-radius: var(--radius); }
+  .tabs { gap: 0; }
+  .tab { padding: var(--space-2) var(--space-3); font-size: 13px; }
+}

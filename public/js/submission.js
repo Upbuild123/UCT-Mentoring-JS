@@ -77,14 +77,11 @@ async function init() {
       nameSpan.textContent = comp.name;
       const req = document.createElement('span');
       req.textContent = ' *';
-      req.style.color = '#d32f2f';
+      req.className = 'required-mark';
       label.appendChild(nameSpan);
       label.appendChild(req);
       const desc = document.createElement('p');
-      desc.className = 'text-gray';
-      desc.style.margin = '2px 0 6px';
-      desc.style.fontStyle = 'italic';
-      desc.style.fontWeight = 'normal';
+      desc.className = 'field-hint';
       desc.textContent = comp.description;
       const select = document.createElement('select');
       select.id = `rating-${comp.name}`;
@@ -118,13 +115,12 @@ async function init() {
     if (required) {
       const req = document.createElement('span');
       req.textContent = ' *';
-      req.style.color = '#d32f2f';
+      req.className = 'required-mark';
       label.appendChild(req);
     } else {
       const opt = document.createElement('span');
       opt.textContent = ' (optional)';
-      opt.style.color = 'var(--gray)';
-      opt.style.fontWeight = 'normal';
+      opt.className = 'optional-mark';
       label.appendChild(opt);
     }
     const textarea = document.createElement('textarea');
@@ -206,10 +202,12 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', '/api/assessments/submit');
+      const fill = document.getElementById('progress-bar-fill');
       xhr.upload.addEventListener('progress', e => {
         if (e.lengthComputable) {
           const pct = Math.round((e.loaded / e.total) * 100);
-          progressMsg.textContent = pct < 100
+          fill.style.width = `${pct}%`;
+          progressMsg.firstChild.textContent = pct < 100
             ? `Uploading… ${pct}%`
             : 'Upload complete. Finishing up…';
         }

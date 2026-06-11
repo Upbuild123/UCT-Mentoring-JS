@@ -70,6 +70,12 @@ function renderAssessments() {
     (a.mentor_name || '').toLowerCase().includes(search)
   );
   list.innerHTML = '';
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">&#128203;</div><p>No assessments match your filters.</p></div>`;
+    return;
+  }
+
   for (const a of filtered) {
     const card = document.createElement('div');
     card.className = 'card';
@@ -84,24 +90,24 @@ function renderAssessments() {
     }
 
     card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="flex-row">
         <strong>${a.student_name}</strong>
-        <span class="text-gray">(${a.mentor_name})</span>
-        <span>Round ${a.round}</span>
+        <span class="text-gray">${a.mentor_name}</span>
+        <span class="badge badge-gray">Round ${a.round}</span>
         <span class="text-gray">${date}</span>
         <span class="badge ${badgeClass}">${a.status}</span>
         ${processingWarning}
         ${a.error_message ? `<span class="text-gray" title="${a.error_message}">⚠ ${a.error_message.slice(0, 60)}</span>` : ''}
-        <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
-          <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}${t}">Review</a>
-          ${a.transcript || a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/transcript.html?assessment_id=${a.id}${t}" target="_blank">Transcript</a>` : ''}
-          ${a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/ai-review.html?assessment_id=${a.id}${t}" target="_blank">AI Generated Analysis</a>` : ''}
-          ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">PDF</a>` : ''}
-          ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
-          ${a.status === 'error' ? `<button class="btn btn-secondary btn-sm" onclick="retryAssessment(${a.id})">Retry</button>` : ''}
-          ${a.status === 'complete' ? `<button class="btn btn-secondary btn-sm" onclick="regenerateReview(${a.id})">Regen AI</button>` : ''}
-          <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteAssessment(${a.id})">Delete</button>
-        </div>
+      </div>
+      <div class="flex-row mt-16">
+        <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}${t}">Review</a>
+        ${a.transcript || a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/transcript.html?assessment_id=${a.id}${t}" target="_blank">Transcript</a>` : ''}
+        ${a.status === 'complete' ? `<a class="btn btn-secondary btn-sm" href="/ai-review.html?assessment_id=${a.id}${t}" target="_blank">AI Generated Analysis</a>` : ''}
+        ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">PDF</a>` : ''}
+        ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
+        ${a.status === 'error' ? `<button class="btn btn-secondary btn-sm" onclick="retryAssessment(${a.id})">Retry</button>` : ''}
+        ${a.status === 'complete' ? `<button class="btn btn-secondary btn-sm" onclick="regenerateReview(${a.id})">Regen AI</button>` : ''}
+        <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="deleteAssessment(${a.id})">Delete</button>
       </div>`;
     list.appendChild(card);
   }
@@ -147,7 +153,7 @@ function renderMentors() {
         </div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button class="btn btn-primary btn-sm" onclick="saveMentor(${m.id}, this)">Save</button>
-          <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteMentor(${m.id})">Delete</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMentor(${m.id})">Delete</button>
         </div>
       </div>`;
     list.appendChild(details);
@@ -211,7 +217,7 @@ function renderStudents() {
       </div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <button class="btn btn-primary btn-sm" onclick="saveStudent(${s.id}, this)">Save</button>
-        <button class="btn btn-sm" style="background:#d32f2f;color:#fff" onclick="deleteStudent(${s.id})">Delete</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
       </div>`;
     list.appendChild(details);
   }
