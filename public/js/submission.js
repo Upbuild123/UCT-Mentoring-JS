@@ -107,7 +107,7 @@ async function init() {
   document.getElementById('skills-ratings').addEventListener('change', saveDraft);
 
   const reflContainer = document.getElementById('reflection-questions');
-  for (const { q, required } of REFLECTION_QUESTIONS) {
+  REFLECTION_QUESTIONS.forEach(({ q, required }, i) => {
     const div = document.createElement('div');
     div.className = 'form-group';
     const label = document.createElement('label');
@@ -127,11 +127,14 @@ async function init() {
     textarea.dataset.question = q;
     textarea.className = 'reflection-textarea';
     if (required) textarea.required = true;
+    const baseHeight = 90;
+    const height = i < 2 ? baseHeight * 1.5 : i >= 3 ? baseHeight * 0.5 : baseHeight;
+    textarea.style.minHeight = `${height}px`;
     div.appendChild(label);
     div.appendChild(textarea);
     textarea.addEventListener('input', saveDraft);
     reflContainer.appendChild(div);
-  }
+  });
 
   restoreDraft();
 }
