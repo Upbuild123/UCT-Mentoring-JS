@@ -90,16 +90,16 @@ ${transcript}
 
 ## OUTPUT STRUCTURE
 
-Use this exact structure. Use bold headings only — no large markdown headings (do not use # or ##). Format as a clean professional document.
+Use this exact structure. Use `##` markdown headings for each main section (as shown below), and bold/italic for sub-labels within a section. Format as a clean professional document.
 
-**Summary**
+## Summary
 
 In 1-2 paragraphs, focused on the COACH (not a recap of the client's situation):
 - What was the coach's overall effectiveness?
 - What stands out most about the coach's style?
 - What appears to be the coach's single highest-leverage developmental edge (preview only — detailed below)?
 
-**Dominant Coaching Strategy**
+## Dominant Coaching Strategy
 
 Diagnose the coach's dominant, default strategy in this session — e.g., validation, encouragement, problem-solving, reflection, reassurance, information-giving, etc. A coach can have more than one, but identify the most dominant one or two.
 
@@ -108,7 +108,7 @@ For the dominant strategy:
 - Benefits: what this strategy does well for the client and the relationship.
 - Costs: what this strategy tends to crowd out, avoid, or limit when overused.
 
-**Client Agendas**
+## Client Agendas
 
 Based on the transcript, identify:
 
@@ -123,7 +123,7 @@ Based on the transcript, identify:
 
 Then assess: at which of these levels was the coach actually working? Was that the appropriate level given where the client was, or did the coach stay shallower (or go deeper) than the client was ready for?
 
-**Meta-Skills**
+## Meta-Skills
 
 Assess the coach specifically on two meta-skills:
 
@@ -139,7 +139,7 @@ Assess the coach specifically on two meta-skills:
 - Or did the coach stay in comfortable, predictable patterns?
 - Specific examples from the transcript.
 
-**Coaching Strengths**
+## Coaching Strengths
 
 Identify between 3 and 7 strengths — no fewer than 3, no more than 7. For each:
 
@@ -151,7 +151,7 @@ Identify between 3 and 7 strengths — no fewer than 3, no more than 7. For each
 
 Focus on recurring strengths — patterns that showed up more than once — not isolated moments.
 
-**Deepest Doorways**
+## Deepest Doorways
 
 Identify 1-5 moments with the greatest transformational potential. For each:
 - Quote the client's statement.
@@ -162,7 +162,7 @@ Identify 1-5 moments with the greatest transformational potential. For each:
 
 Focus on moments where identity, values, fear, assumptions, tension, purpose, or meaning emerged.
 
-**The Highest-Leverage Developmental Edge**
+## The Highest-Leverage Developmental Edge
 
 Do not list multiple developmental opportunities. Identify ONE single developmental edge — the one that, if shifted, would most improve this coach's effectiveness across sessions, not just this one.
 
@@ -177,7 +177,7 @@ Structure:
 *The Edge*
 [Name the shift in one or two sentences — what would the coach do differently.]
 
-**One Practice to Carry Forward**
+## One Practice to Carry Forward
 
 Replace generic suggestions with ONE concrete behavioral practice the coach can apply across the next several sessions (not just the next one). It should be specific enough that the coach knows exactly what to do differently in the moment.
 
