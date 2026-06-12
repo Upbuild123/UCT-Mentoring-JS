@@ -174,7 +174,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   if (!videoFile) return showBanner(bannerArea, 'Please upload a recording.');
 
   if (duplicateExists && !document.getElementById('duplicate-confirm').checked) {
-    return showBanner(bannerArea, 'Please confirm you want to submit a duplicate.');
+    return showBanner(bannerArea, 'Please confirm you want to replace your previous submission.');
   }
 
   const ratings = {};

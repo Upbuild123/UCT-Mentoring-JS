@@ -49,6 +49,20 @@ router.post('/submit', upload.single('video'), async (req, res, next) => {
   try {
     const { student_id, round, competency_ratings, reflections } = req.body;
     const mentor_token = crypto.randomUUID();
+
+    const { data: existing } = await supabase
+      .from('assessments')
+      .select('id')
+      .eq('student_id', parseInt(student_id))
+      .eq('round', parseInt(round))
+      .maybeSingle();
+
+    if (existing) {
+      await supabase.from('ai_reviews').delete().eq('assessment_id', existing.id);
+      await supabase.from('mentor_feedback').delete().eq('assessment_id', existing.id);
+      await supabase.from('assessments').delete().eq('id', existing.id);
+    }
+
     const { data, error } = await supabase
       .from('assessments')
       .insert({
