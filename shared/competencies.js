@@ -23,7 +23,7 @@ const REFLECTION_QUESTIONS = [
   'What are you learning about your style as a coach? How would your clients describe you?',
   'What is your next developmental opportunity?',
   'Questions you have about this session or coaching in general',
-  'If your session is longer than 30 minutes, which portion of the recording should your mentor listen to?',
+  'If your session is longer than 30 mins, which portion should your mentor listen to?',
 ];
 
 const MENTOR_QUESTIONS = [

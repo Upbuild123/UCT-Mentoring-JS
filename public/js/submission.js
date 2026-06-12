@@ -16,7 +16,7 @@ const REFLECTION_QUESTIONS = [
   { q: 'What are you learning about your style as a coach? How would your clients describe you?', required: true },
   { q: 'What is your next developmental opportunity?', required: true },
   { q: 'Questions you have about this session or coaching in general', required: false },
-  { q: 'If your session is longer than 30 minutes, which portion of the recording should your mentor listen to?', required: false },
+  { q: 'If your session is longer than 30 mins, which portion should your mentor listen to?', required: false, oneLine: true },
 ];
 
 const DRAFT_KEY = 'submission_draft';
@@ -107,7 +107,7 @@ async function init() {
   document.getElementById('skills-ratings').addEventListener('change', saveDraft);
 
   const reflContainer = document.getElementById('reflection-questions');
-  REFLECTION_QUESTIONS.forEach(({ q, required }, i) => {
+  REFLECTION_QUESTIONS.forEach(({ q, required, oneLine }, i) => {
     const div = document.createElement('div');
     div.className = 'form-group';
     const label = document.createElement('label');
@@ -128,7 +128,7 @@ async function init() {
     textarea.className = 'reflection-textarea';
     if (required) textarea.required = true;
     const baseHeight = 90;
-    const height = i < 2 ? baseHeight * 1.5 : i >= 3 ? baseHeight * 0.5 : baseHeight;
+    const height = oneLine ? 42 : i < 2 ? baseHeight * 1.5 : i >= 3 ? baseHeight * 0.5 : baseHeight;
     textarea.style.minHeight = `${height}px`;
     div.appendChild(label);
     div.appendChild(textarea);
