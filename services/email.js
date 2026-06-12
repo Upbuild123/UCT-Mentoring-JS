@@ -20,11 +20,12 @@ async function sendMentorNotification({ mentorEmail, mentorName, mentorId, stude
     html: `<p>Hi ${mentorFirst},</p>
 <p>There is a new mentoring recording to review from ${studentFirst}.</p>
 <ul>
-  <li><a href="${videoDriveUrl}">Video recording</a></li>
+  <li><a href="${videoDriveUrl}">Coaching session recording</a></li>
   <li><a href="${appUrl}/transcript.html?assessment_id=${assessmentId}${t}">Transcript</a></li>
   <li><a href="${appUrl}/ai-review.html?assessment_id=${assessmentId}${t}">AI Generated Analysis</a></li>
 </ul>
-<p>After your mentoring meeting, <a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}${t}">submit mentor feedback</a>.</p>
+<br>
+<p>After your mentoring meeting, <a href="${appUrl}/mentor-review.html?assessment_id=${assessmentId}${t}">submit mentoring assessment</a>.</p>
 <p><a href="${appUrl}/mentor-dashboard.html?mentor_id=${mentorId}${dt}">View your mentor dashboard</a></p>`,
   });
 }
