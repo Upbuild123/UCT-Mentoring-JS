@@ -51,10 +51,10 @@ async function addSpeakerLabels(client, rawTranscript) {
     model: 'gpt-4o',
     messages: [{
       role: 'user',
-      content: `Below is a raw transcript of a coaching session between a coach and their client.\n\nReformat it with speaker labels on each turn. Use exactly "Coach:" and "Client:" as labels.\n- The coach typically asks questions, reflects back, and facilitates exploration.\n- The client shares their experience, challenges, and goals.\n\nReturn only the formatted transcript — no commentary, no preamble.\n\nRaw transcript:\n${rawTranscript}`,
+      content: `Below is a raw transcript of a coaching session between a coach and their client.\n\nReformat it with speaker labels on each turn. Use exactly "Coach:" and "Client:" as labels — plain text, with no markdown formatting (no asterisks, no bold, no headings).\n- The coach typically asks questions, reflects back, and facilitates exploration.\n- The client shares their experience, challenges, and goals.\n\nReturn only the formatted transcript — no commentary, no preamble.\n\nRaw transcript:\n${rawTranscript}`,
     }],
   });
-  return response.choices[0].message.content.trim().replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/, '');
+  return response.choices[0].message.content.trim().replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/, '').replace(/\*\*/g, '');
 }
 
 async function generateAiReview(assessment, transcript) {
@@ -90,7 +90,7 @@ ${transcript}
 
 ## OUTPUT STRUCTURE
 
-Use this exact structure. Use `##` markdown headings for each main section (as shown below), and bold/italic for sub-labels within a section. Format as a clean professional document.
+Use this exact structure. Use ## markdown headings for each main section (as shown below), and bold/italic for sub-labels within a section. Format as a clean professional document.
 
 ## Summary
 
