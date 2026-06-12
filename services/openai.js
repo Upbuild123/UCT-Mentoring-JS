@@ -113,13 +113,13 @@ For the dominant strategy:
 Based on the transcript, identify:
 
 *Presenting Agenda*
-[The surface-level topic or issue the client brought to the session.]
+[What the client wants to work on and the expected outcome.]
 
 *Deeper Agenda*
-[The underlying pattern, belief, fear, or dynamic beneath the presenting topic.]
+[What is underneath the presenting agenda, and why it matters to the client.]
 
 *Potential Transformational Agenda*
-[The identity-level shift or growth edge available to the client, if the coaching went as deep as possible.]
+[Who the client is becoming — the deepest level of coaching available in this session.]
 
 Then assess: at which of these levels was the coach actually working? Was that the appropriate level given where the client was, or did the coach stay shallower (or go deeper) than the client was ready for?
 
