@@ -75,6 +75,11 @@ router.put('/:id', requireAdmin, async (req, res, next) => {
 
 router.delete('/:id', requireAdmin, async (req, res, next) => {
   try {
+    const { count } = await supabase
+      .from('students')
+      .select('id', { count: 'exact', head: true })
+      .eq('mentor_id', req.params.id);
+    if (count) return res.status(409).json({ error: `This mentor has ${count} student(s). Reassign or delete them first.` });
     const { error } = await supabase.from('mentors').delete().eq('id', req.params.id);
     if (error) throw error;
     res.json({ success: true });

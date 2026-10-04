@@ -220,6 +220,11 @@ router.post('/:id/regenerate-ai-review', requireAdmin, async (req, res, next) =>
 
 router.delete('/:id', requireAdmin, async (req, res, next) => {
   try {
+    // Child rows reference the assessment without ON DELETE CASCADE, so remove them first
+    for (const table of ['mentor_feedback', 'ai_reviews']) {
+      const { error } = await supabase.from(table).delete().eq('assessment_id', req.params.id);
+      if (error) throw error;
+    }
     const { error } = await supabase.from('assessments').delete().eq('id', req.params.id);
     if (error) throw error;
     res.json({ success: true });

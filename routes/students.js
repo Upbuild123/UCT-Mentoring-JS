@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const supabase = require('../services/supabase');
+const { requireAdmin } = require('./admin');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -15,7 +16,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', requireAdmin, async (req, res, next) => {
   try {
     const { name, email, mentor_id } = req.body;
     const { data, error } = await supabase
@@ -30,7 +31,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', requireAdmin, async (req, res, next) => {
   try {
     const { name, email, mentor_id } = req.body;
     const { data, error } = await supabase
@@ -46,8 +47,13 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', requireAdmin, async (req, res, next) => {
   try {
+    const { count } = await supabase
+      .from('assessments')
+      .select('id', { count: 'exact', head: true })
+      .eq('student_id', req.params.id);
+    if (count) return res.status(409).json({ error: `This student has ${count} assessment(s). Delete those first.` });
     const { error } = await supabase.from('students').delete().eq('id', req.params.id);
     if (error) throw error;
     res.json({ success: true });
@@ -56,7 +62,7 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-router.post('/bulk-import', async (req, res, next) => {
+router.post('/bulk-import', requireAdmin, async (req, res, next) => {
   try {
     const { rows } = req.body; // [{ name, email, mentor_name }]
     const { data: mentors, error: mErr } = await supabase.from('mentors').select('id, name');

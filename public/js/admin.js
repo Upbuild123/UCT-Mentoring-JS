@@ -47,11 +47,27 @@ const STATUS_BADGE = {
 let allAssessments = [], allMentors = [], allStudents = [];
 
 async function loadAll() {
-  [allAssessments, allMentors, allStudents] = await Promise.all([
-    apiFetch('/api/assessments/all'),
-    apiFetch('/api/mentors'),
-    apiFetch('/api/students'),
-  ]);
+  try {
+    [allAssessments, allMentors, allStudents] = await Promise.all([
+      apiFetch('/api/assessments/all'),
+      apiFetch('/api/mentors'),
+      apiFetch('/api/students'),
+    ]);
+  } catch (err) {
+    // Sessions live in server memory, so a restart/redeploy invalidates the saved token
+    if (err.message === 'Unauthorized') {
+      sessionStorage.removeItem('adminToken');
+      document.getElementById('admin-main').style.display = 'none';
+      document.getElementById('auth-modal').style.display = '';
+      const el = document.getElementById('auth-error');
+      el.style.display = 'block';
+      el.textContent = 'Your session expired. Please log in again.';
+      return;
+    }
+    document.getElementById('assessments-list').innerHTML = '';
+    showBanner(document.getElementById('admin-main'), `Could not load dashboard: ${err.message}`);
+    return;
+  }
   renderAssessments();
   renderMentors();
   renderStudents();
@@ -128,7 +144,11 @@ async function regenerateReview(id) {
 
 async function deleteAssessment(id) {
   if (!confirm('Delete this assessment? This cannot be undone.')) return;
-  await apiFetch(`/api/assessments/${id}`, { method: 'DELETE' });
+  try {
+    await apiFetch(`/api/assessments/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    return alert(`Could not delete: ${err.message}`);
+  }
   await loadAll();
 }
 
@@ -169,7 +189,11 @@ function copyDashboardLink(mentorId, token) {
 
 async function deleteMentor(id) {
   if (!confirm('Delete this mentor? This cannot be undone.')) return;
-  await apiFetch(`/api/mentors/${id}`, { method: 'DELETE' });
+  try {
+    await apiFetch(`/api/mentors/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    return alert(`Could not delete: ${err.message}`);
+  }
   await loadAll();
 }
 
@@ -226,7 +250,11 @@ function renderStudents() {
 
 async function deleteStudent(id) {
   if (!confirm('Delete this student? This cannot be undone.')) return;
-  await apiFetch(`/api/students/${id}`, { method: 'DELETE' });
+  try {
+    await apiFetch(`/api/students/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    return alert(`Could not delete: ${err.message}`);
+  }
   await loadAll();
 }
 
