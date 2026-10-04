@@ -27,9 +27,7 @@ async function processAssessment(assessmentId, videoPath) {
     let folderId = assessment.drive_folder_id;
     let folderUrl = assessment.drive_folder_url;
     if (!folderId) {
-      const result = await drive.createStudentRoundFolder(
-        student.name, assessment.round, student.email || ''
-      );
+      const result = await drive.getStudentMentoringFolder(student.name);
       folderId = result.folderId;
       folderUrl = result.folderUrl;
       await updateAssessment(assessmentId, { drive_folder_id: folderId, drive_folder_url: folderUrl });
@@ -60,8 +58,9 @@ async function processAssessment(assessmentId, videoPath) {
       if (p) try { fs.unlinkSync(p); } catch {}
     }
 
-    // Step 5: Upload transcript docx
-    if (transcript) {
+    // Step 5: Upload transcript docx (skip if a retry of this same submission already uploaded it)
+    const transcriptName = `${baseName}. Transcript.docx`;
+    if (transcript && !(await drive.uploadedSince(folderId, transcriptName, assessment.submitted_at))) {
       const doc = new Document({
         sections: [{
           children: [
@@ -72,7 +71,7 @@ async function processAssessment(assessmentId, videoPath) {
       });
       const docBuffer = await Packer.toBuffer(doc);
       await drive.uploadBuffer(
-        docBuffer, folderId, `${baseName}. Transcript.docx`,
+        docBuffer, folderId, transcriptName,
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       );
     }

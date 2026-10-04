@@ -8,6 +8,11 @@ function getAuth() {
       private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
     },
     scopes: ['https://www.googleapis.com/auth/drive'],
+    // Service accounts have no storage of their own, so act as a real Workspace user
+    // (requires domain-wide delegation for the Drive scope)
+    clientOptions: process.env.GOOGLE_IMPERSONATE_USER
+      ? { subject: process.env.GOOGLE_IMPERSONATE_USER }
+      : undefined,
   });
 }
 
@@ -16,8 +21,12 @@ async function getDrive() {
   return google.drive({ version: 'v3', auth });
 }
 
+function escapeQuery(value) {
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 async function findFolder(drive, name, parentId) {
-  const query = `name = '${name}' and '${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+  const query = `name = '${escapeQuery(name)}' and '${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
   const res = await drive.files.list({
     q: query,
     fields: 'files(id)',
@@ -49,54 +58,74 @@ async function getWebLink(drive, fileId) {
   return res.data.webViewLink;
 }
 
-async function shareFolder(drive, folderId, email) {
-  await drive.permissions.create({
-    fileId: folderId,
-    requestBody: { type: 'user', role: 'writer', emailAddress: email },
-    supportsAllDrives: true,
-    sendNotificationEmail: false,
-  });
+async function findOrCreateFolder(drive, name, parentId) {
+  return (await findFolder(drive, name, parentId)) || createFolder(drive, name, parentId);
 }
 
-const MENTOR_EMAILS = [
-  'gina@upbuild.com',
-  'michael@upbuild.com',
-  'tzipi@upbuild.com',
-  'mary@upbuild.com',
-  'vipin@upbuild.com',
-  'melissa@upbuild.com',
-];
-
-async function createStudentRoundFolder(studentName, round, studentEmail = '') {
+// Files go straight into <parent>/<Student Name>/Mentoring/ (file names carry the round).
+// Student folders are created and shared by hand ahead of the course, so a missing one is an error.
+async function getStudentMentoringFolder(studentName) {
   const drive = await getDrive();
   const parentId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
+  const mentoringName = process.env.GOOGLE_DRIVE_MENTORING_SUBFOLDER || 'Mentoring';
 
-  let studentFolderId = await findFolder(drive, studentName, parentId);
-  const isNew = !studentFolderId;
-  if (isNew) {
-    studentFolderId = await createFolder(drive, studentName, parentId);
+  const studentFolderId = await findFolder(drive, studentName.trim(), parentId);
+  if (!studentFolderId) {
+    throw new Error(`No Google Drive folder named "${studentName}" in the student folders. Create it (or fix the name) and click Retry.`);
   }
 
-  if (isNew && studentEmail) {
-    await shareFolder(drive, studentFolderId, studentEmail);
-  }
+  const folderId = await findOrCreateFolder(drive, mentoringName, studentFolderId);
+  const folderUrl = await getWebLink(drive, folderId);
+  return { folderId, folderUrl };
+}
 
-  if (isNew) {
-    for (const email of MENTOR_EMAILS) {
-      await shareFolder(drive, studentFolderId, email);
-    }
-  }
+async function listFolderFiles(drive, folderId) {
+  const res = await drive.files.list({
+    q: `'${folderId}' in parents and trashed = false`,
+    fields: 'files(id, name, createdTime)',
+    pageSize: 1000,
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
+  });
+  return res.data.files || [];
+}
 
-  const roundFolderId = await createFolder(drive, `Round ${round}`, studentFolderId);
-  const folderUrl = await getWebLink(drive, roundFolderId);
-  return { folderId: roundFolderId, folderUrl };
+function splitExt(name) {
+  const i = name.lastIndexOf('.');
+  return i > 0 ? [name.slice(0, i), name.slice(i)] : [name, ''];
+}
+
+// "X. Recording.mp4" plus its resubmitted versions "X. Recording v2.mp4", "v3", ...
+function isVersionOf(fileName, driveFileName) {
+  if (fileName === driveFileName) return true;
+  const [stem, ext] = splitExt(driveFileName);
+  return fileName.startsWith(`${stem} v`) && fileName.endsWith(ext)
+    && /^\d+$/.test(fileName.slice(stem.length + 2, fileName.length - ext.length));
+}
+
+// Never overwrite: a resubmitted round is saved alongside the original as "... v2", "... v3"
+async function nextVersionName(drive, folderId, driveFileName) {
+  const existing = new Set((await listFolderFiles(drive, folderId)).map(f => f.name));
+  if (!existing.has(driveFileName)) return driveFileName;
+  const [stem, ext] = splitExt(driveFileName);
+  let n = 2;
+  while (existing.has(`${stem} v${n}${ext}`)) n++;
+  return `${stem} v${n}${ext}`;
+}
+
+// True if this file (any version) was already uploaded after `since`, i.e. by the current submission
+async function uploadedSince(folderId, driveFileName, since) {
+  const drive = await getDrive();
+  const sinceMs = new Date(since).getTime();
+  return (await listFolderFiles(drive, folderId))
+    .some(f => isVersionOf(f.name, driveFileName) && new Date(f.createdTime).getTime() >= sinceMs);
 }
 
 async function uploadFile(localPath, folderId, driveFileName) {
   const drive = await getDrive();
   const res = await drive.files.create({
     requestBody: {
-      name: driveFileName,
+      name: await nextVersionName(drive, folderId, driveFileName),
       parents: [folderId],
     },
     media: {
@@ -114,7 +143,7 @@ async function uploadBuffer(buffer, folderId, driveFileName, mimeType) {
   const stream = Readable.from(buffer);
   const res = await drive.files.create({
     requestBody: {
-      name: driveFileName,
+      name: await nextVersionName(drive, folderId, driveFileName),
       parents: [folderId],
     },
     media: { mimeType, body: stream },
@@ -124,4 +153,4 @@ async function uploadBuffer(buffer, folderId, driveFileName, mimeType) {
   return getWebLink(drive, res.data.id);
 }
 
-module.exports = { createStudentRoundFolder, uploadFile, uploadBuffer };
+module.exports = { getStudentMentoringFolder, uploadedSince, uploadFile, uploadBuffer };
