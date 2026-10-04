@@ -41,9 +41,23 @@ async function transcribe(audioPath) {
     const result = await client.audio.transcriptions.create({
       model: 'whisper-1',
       file: fs.createReadStream(audioPath),
+      response_format: 'verbose_json',
+      timestamp_granularities: ['segment'],
     });
-    return addSpeakerLabels(client, result.text);
+    const timed = (result.segments || [])
+      .map(s => `[${formatTimestamp(s.start)}] ${s.text.trim()}`)
+      .join('\n');
+    return addSpeakerLabels(client, timed || result.text);
   });
+}
+
+// 83.4 -> "01:23"; sessions over an hour get "1:02:03"
+function formatTimestamp(seconds) {
+  const total = Math.floor(seconds);
+  const h = Math.floor(total / 3600);
+  const m = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+  const s = String(total % 60).padStart(2, '0');
+  return h ? `${h}:${m}:${s}` : `${m}:${s}`;
 }
 
 async function addSpeakerLabels(client, rawTranscript) {
@@ -51,7 +65,7 @@ async function addSpeakerLabels(client, rawTranscript) {
     model: 'gpt-4o',
     messages: [{
       role: 'user',
-      content: `Below is a raw transcript of a coaching session between a coach and their client.\n\nReformat it with speaker labels on each turn. Use exactly "Coach:" and "Client:" as labels — plain text, with no markdown formatting (no asterisks, no bold, no headings).\n- The coach typically asks questions, reflects back, and facilitates exploration.\n- The client shares their experience, challenges, and goals.\n\nReturn only the formatted transcript — no commentary, no preamble.\n\nRaw transcript:\n${rawTranscript}`,
+      content: `Below is a raw transcript of a coaching session between a coach and their client. Each line starts with a [MM:SS] timestamp marking when that segment begins.\n\nReformat it with speaker labels on each turn. Use exactly "Coach:" and "Client:" as labels — plain text, with no markdown formatting (no asterisks, no bold, no headings).\n- Start every turn on its own line with the timestamp of the first segment in that turn, then the label, e.g. "[01:23] Coach: ...". Copy timestamps exactly; never invent or change them.\n- Merge consecutive segments from the same speaker into one turn, and drop the timestamps of the merged segments after the first.\n- The coach typically asks questions, reflects back, and facilitates exploration.\n- The client shares their experience, challenges, and goals.\n\nReturn only the formatted transcript — no commentary, no preamble.\n\nRaw transcript:\n${rawTranscript}`,
     }],
   });
   return response.choices[0].message.content.trim().replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/, '').replace(/\*\*/g, '');
