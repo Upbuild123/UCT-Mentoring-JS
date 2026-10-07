@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const supabase = require('../services/supabase');
 const { processAssessment } = require('../services/processor');
 const { isAdmin, requireAdmin } = require('./admin');
@@ -77,7 +79,13 @@ router.post('/submit', upload.single('video'), async (req, res, next) => {
       .single();
     if (error) throw error;
 
-    const videoPath = req.file ? req.file.path : null;
+    // Keep the original extension so the Drive copy is saved as .mp4 / .mp3 / etc.
+    let videoPath = req.file ? req.file.path : null;
+    const ext = req.file ? path.extname(req.file.originalname).toLowerCase() : '';
+    if (videoPath && ext) {
+      fs.renameSync(videoPath, videoPath + ext);
+      videoPath += ext;
+    }
     processAssessment(data.id, videoPath).catch(err =>
       console.error(`Processing failed for assessment ${data.id}:`, err)
     );

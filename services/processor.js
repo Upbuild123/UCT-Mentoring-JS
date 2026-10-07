@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { Document, Paragraph, Packer } = require('docx');
 const supabase = require('./supabase');
 const drive = require('./drive');
@@ -36,7 +37,7 @@ async function processAssessment(assessmentId, videoPath) {
     // Step 2: Upload video (skip if already done)
     let videoDriveUrl = assessment.video_drive_url;
     if (!videoDriveUrl && videoPath && fs.existsSync(videoPath)) {
-      videoDriveUrl = await drive.uploadFile(videoPath, folderId, `${baseName}. Recording.mp4`);
+      videoDriveUrl = await drive.uploadFile(videoPath, folderId, `${baseName}. Recording${path.extname(videoPath) || '.mp4'}`);
       await updateAssessment(assessmentId, { video_drive_url: videoDriveUrl });
     }
 
