@@ -32,6 +32,16 @@ if (require.main === module) {
   // Allow long-running uploads of large video files on slow connections
   server.requestTimeout = 30 * 60 * 1000;
   server.headersTimeout = 30 * 60 * 1000;
+
+  // Supabase's free tier pauses projects after 7 days without activity, so touch the
+  // database once a day to keep it awake between courses
+  const keepDatabaseAwake = async () => {
+    const { error } = await require('./services/supabase')
+      .from('mentors').select('id', { count: 'exact', head: true });
+    if (error) console.error('Daily database keep-alive failed:', error.message);
+  };
+  keepDatabaseAwake();
+  setInterval(keepDatabaseAwake, 24 * 60 * 60 * 1000);
 }
 
 module.exports = app;
