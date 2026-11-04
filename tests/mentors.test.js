@@ -15,14 +15,30 @@ jest.mock('../services/supabase', () => ({
   }),
 }));
 
-test('GET /api/mentors returns mentor list', async () => {
+async function adminToken() {
+  process.env.ADMIN_PASSWORD = 'secret';
+  const res = await request(app).post('/api/admin/auth').send({ password: 'secret' });
+  return res.body.token;
+}
+
+test('GET /api/mentors requires admin login', async () => {
   const res = await request(app).get('/api/mentors');
+  expect(res.status).toBe(401);
+});
+
+test('GET /api/mentors returns mentor list to admins', async () => {
+  const res = await request(app).get('/api/mentors').set('Authorization', `Bearer ${await adminToken()}`);
   expect(res.status).toBe(200);
   expect(Array.isArray(res.body)).toBe(true);
 });
 
-test('GET /api/mentors/:id returns one mentor', async () => {
-  const res = await request(app).get('/api/mentors/1');
+test('GET /api/mentors/:id returns one mentor with a valid dashboard token', async () => {
+  const res = await request(app).get('/api/mentors/1?token=abc');
   expect(res.status).toBe(200);
   expect(res.body.name).toBe('Bob');
+});
+
+test('GET /api/mentors/:id rejects a wrong dashboard token', async () => {
+  const res = await request(app).get('/api/mentors/1?token=wrong');
+  expect(res.status).toBe(401);
 });

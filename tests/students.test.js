@@ -16,3 +16,9 @@ test('GET /api/students returns student list', async () => {
   expect(Array.isArray(res.body)).toBe(true);
   expect(res.body[0].name).toBe('Alice');
 });
+
+test('GET /api/students does not expose emails to the public', async () => {
+  const supabase = require('../services/supabase');
+  await request(app).get('/api/students');
+  expect(supabase.select).toHaveBeenLastCalledWith('id, name, mentor_id');
+});
