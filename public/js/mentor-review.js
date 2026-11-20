@@ -15,10 +15,10 @@ const COMPETENCIES = [
 const RATING_OPTIONS = ['-- select --', '1. Not Demonstrated', '2. Emerging', '3. Competent', '4. Exceptional'];
 
 const MENTOR_QUESTIONS = [
-  'What did the coach do well in this coaching session?',
-  'What opportunities were there to strengthen this coaching session?',
-  'What are the developmental opportunities for the coach?',
-  'What are 1-2 development practices for the coach?',
+  'Strengths: What did the coach do well in this session?',
+  'Development areas: What opportunities were there to improve the coaching?',
+  'Style: What do you notice about the coach’s style?',
+  'Development practices: Which 1–2 development practices should the coach focus on for the next session?',
 ];
 
 const params = new URLSearchParams(location.search);
