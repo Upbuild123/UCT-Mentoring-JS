@@ -214,3 +214,9 @@ test('quotes in a transcript without timestamps verify cleanly', () => {
   const parsed = parseTranscript('Coach: What would be valuable today?\nClient: My health.');
   expect(verifyQuote(parsed, { timestamp: '', speaker: 'Coach', quote: 'What would be valuable today?' }).status).toBe('ok');
 });
+
+test('feedback statements are stored as IDs even when the AI returns full text', () => {
+  const fb = { ...feedbackResult, strengths: [{ ...feedbackResult.strengths[0], statements: ['A3.1 Coach explores the client’s topic with the client'] }, feedbackResult.strengths[1]] };
+  const { form } = assembleDraft({ structure, parsed: parseTranscript(TRANSCRIPT), mentor, admin, statementResults: allIds.map(id => statementResult(id)), feedbackResult: fb });
+  expect(form.strengths[3].statements).toEqual(['A3.1']);
+});

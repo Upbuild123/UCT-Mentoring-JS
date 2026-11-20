@@ -5,6 +5,7 @@ const OpenAI = require('openai');
 const { parseTranscript, asText, normalize } = require('./transcript');
 const { tickBox, fillTextControl, appendToParagraph, paragraphText, balancedEnd, escapeXml, cleanRunProps, feedbackStatementLine, feedbackComments } = require('./fill');
 const { LEVELS } = require('./structure');
+const { statementIds } = require('./draft');
 
 const DEMONSTRATED = 'Proficiency Demonstrated';
 const NOT_YET = 'Proficiency Not Yet Demonstrated';
@@ -235,6 +236,7 @@ async function draftCompetencyReview({ structure, sessions, admin, pendingRounds
   const strengths = {};
   const development = {};
   const place = (section, target, item, comments) => {
+    item = { ...item, statements: statementIds(item.statements) };
     const entry = { statements: item.statements, timestamps: item.evidence, comments };
     if (target[item.competency]) {
       review.feedback.push({ type: 'slot', message: `Two ${section} items were drafted for Competency ${item.competency}; they were combined.` });

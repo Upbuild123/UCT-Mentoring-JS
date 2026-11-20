@@ -51,6 +51,11 @@ async function callModel(client, context, task, schema) {
 
 const TIMESTAMP_IN_TEXT = /\b\d{1,2}:\d{1,2}(?::\d{2})?\b/g;
 
+// The model sometimes returns "A3.2 Coach and client..." instead of "A3.2"
+function statementIds(list) {
+  return [...new Set((list || []).map(s => (String(s).match(/A\d\.\d/) || [])[0]).filter(Boolean))];
+}
+
 function formatEvidence(s, hasTimestamps) {
   const lines = [];
   if (!hasTimestamps) lines.push(NO_TIMESTAMPS);
@@ -137,6 +142,7 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
   const strengths = {};
   const development = {};
   const place = (section, target, item, comments) => {
+    item = { ...item, statements: statementIds(item.statements) };
     if (target[item.competency]) {
       review.feedback.push({ type: 'slot', message: `The draft had two ${section} items for Competency ${item.competency}; they were combined. Please review.` });
       target[item.competency].statements = [...new Set([...target[item.competency].statements, ...item.statements])];
@@ -198,4 +204,4 @@ async function draftIcfForm({ structure, references, parsed, mentor, admin }) {
   return assembleDraft({ structure, parsed, mentor, admin, statementResults, feedbackResult });
 }
 
-module.exports = { draftIcfForm, assembleDraft, mentorInputs, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };
+module.exports = { draftIcfForm, assembleDraft, mentorInputs, statementIds, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };
