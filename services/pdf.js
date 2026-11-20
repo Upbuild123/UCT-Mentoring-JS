@@ -117,4 +117,48 @@ function generatePdf({ assessment, studentName, mentorName, feedbackText, mentor
   });
 }
 
-module.exports = { generatePdf };
+function generatePostReflectionPdf({ studentName, mentorName, round, submittedAt, answers }) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    doc.on('data', chunk => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+
+    const pageWidth = doc.page.width - 100;
+
+    doc.fontSize(14).fillColor(PURPLE).font('Helvetica-Bold')
+      .text(`Post-Meeting Reflection — Round ${round}`, 50, 50);
+    doc.moveTo(50, 75).lineTo(50 + pageWidth, 75).strokeColor(PURPLE).lineWidth(1).stroke();
+
+    doc.y = 85;
+    const metaLines = [
+      ['COACH', studentName],
+      ['MENTOR', mentorName || '—'],
+      ['DATE SUBMITTED', submittedAt
+        ? new Date(submittedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : 'N/A'],
+    ];
+    for (const [label, value] of metaLines) {
+      const y = doc.y;
+      doc.font('Helvetica-Bold').fontSize(9).fillColor(GRAY).text(label, 50, y, { width: 100 });
+      doc.font('Helvetica').fillColor(DARK_TEXT).text(value, 150, y, { width: pageWidth - 100 });
+    }
+
+    doc.moveDown(1);
+    doc.font('Helvetica-Oblique').fontSize(10).fillColor(GRAY)
+      .text('Reflect on your coaching session following the mentoring meeting.', 50, doc.y, { width: pageWidth });
+    doc.moveDown(0.8);
+
+    for (const [question, answer] of Object.entries(answers)) {
+      doc.font('Helvetica-Bold').fontSize(10).fillColor(DARK_TEXT).text(question, 50, doc.y, { width: pageWidth });
+      doc.font('Helvetica').fontSize(10).fillColor('#3C3C3C')
+        .text(answer || '(no answer)', 54, doc.y, { width: pageWidth - 4 });
+      doc.moveDown(0.8);
+    }
+
+    doc.end();
+  });
+}
+
+module.exports = { generatePdf, generatePostReflectionPdf };

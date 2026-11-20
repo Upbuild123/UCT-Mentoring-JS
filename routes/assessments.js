@@ -7,6 +7,7 @@ const path = require('path');
 const supabase = require('../services/supabase');
 const { processAssessment } = require('../services/processor');
 const { isAdmin, requireAdmin } = require('./admin');
+const { POST_REFLECTION_QUESTIONS } = require('../shared/competencies');
 
 const upload = multer({
   dest: 'uploads/',
@@ -19,6 +20,14 @@ async function requireMentorAccess(req, res, next) {
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
   const { data } = await supabase.from('assessments').select('mentor_token').eq('id', req.params.id).single();
   if (!data || data.mentor_token !== token) return res.status(401).json({ error: 'Unauthorized' });
+  next();
+}
+
+async function requireStudentAccess(req, res, next) {
+  const token = req.query.token;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const { data } = await supabase.from('assessments').select('student_token').eq('id', req.params.id).single();
+  if (!data || !data.student_token || data.student_token !== token) return res.status(401).json({ error: 'Unauthorized' });
   next();
 }
 
@@ -74,6 +83,7 @@ router.post('/submit', upload.single('video'), async (req, res, next) => {
         reflections: JSON.parse(reflections),
         status: 'submitted',
         mentor_token,
+        student_token: crypto.randomUUID(),
       })
       .select()
       .single();
@@ -174,6 +184,50 @@ router.post('/:id/mentor-feedback', requireMentorAccess, async (req, res, next) 
     const { generateAndSendPdf } = require('../services/processor');
     generateAndSendPdf(parseInt(req.params.id)).catch(err =>
       console.error(`PDF generation failed for assessment ${req.params.id}:`, err)
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/:id/post-reflection', requireStudentAccess, async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('assessments')
+      .select('round, post_reflections, students(name)')
+      .eq('id', req.params.id)
+      .single();
+    if (error) throw error;
+    res.json({
+      student_name: data.students?.name,
+      round: data.round,
+      questions: POST_REFLECTION_QUESTIONS,
+      answers: data.post_reflections || {},
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/:id/post-reflection', requireStudentAccess, async (req, res, next) => {
+  try {
+    const answers = {};
+    for (const q of POST_REFLECTION_QUESTIONS) {
+      const a = String(req.body.answers?.[q] || '').trim();
+      if (!a) return res.status(400).json({ error: `Please answer: ${q}` });
+      answers[q] = a;
+    }
+    const { error } = await supabase
+      .from('assessments')
+      .update({ post_reflections: answers, post_reflections_submitted_at: new Date().toISOString() })
+      .eq('id', req.params.id);
+    if (error) throw error;
+
+    const { savePostReflection } = require('../services/processor');
+    savePostReflection(parseInt(req.params.id)).catch(err =>
+      console.error(`Saving post-meeting reflection failed for assessment ${req.params.id}:`, err)
     );
 
     res.json({ success: true });

@@ -99,6 +99,25 @@ if (!token) {
       reflContainer.appendChild(div);
     });
 
+    const postReflections = Object.entries(data.post_reflections || {});
+    if (postReflections.length) {
+      document.getElementById('post-reflections-section').style.display = 'block';
+      const postContainer = document.getElementById('post-reflections');
+      for (const [q, a] of postReflections) {
+        const div = document.createElement('div');
+        div.className = 'card';
+        const label = document.createElement('label');
+        label.style.marginBottom = '6px';
+        label.textContent = q;
+        const p = document.createElement('p');
+        p.style.color = 'var(--text-soft)';
+        p.textContent = a;
+        div.appendChild(label);
+        div.appendChild(p);
+        postContainer.appendChild(div);
+      }
+    }
+
     const existingFeedback = data.mentor_feedback?.[0]?.feedback_text || {};
     const feedbackContainer = document.getElementById('mentor-feedback-fields');
     for (const q of MENTOR_QUESTIONS) {

@@ -161,10 +161,56 @@ async function generateAndSendPdf(assessmentId) {
 
   await updateAssessment(assessmentId, { pdf_drive_url: pdfDriveUrl });
 
+  // Submissions from before post-meeting reflections existed have no student token yet
+  let studentToken = assessment.student_token;
+  if (!studentToken) {
+    studentToken = require('crypto').randomUUID();
+    await updateAssessment(assessmentId, { student_token: studentToken });
+  }
+
   await email.sendCompletionNotification({
     mentorEmail: mentor.email,
     mentorName: mentor.name,
     studentEmail: student.email || '',
+    studentName: student.name,
+    roundNum: assessment.round,
+    pdfDriveUrl,
+    assessmentId,
+    studentToken,
+  });
+
+  return pdfDriveUrl;
+}
+
+async function savePostReflection(assessmentId) {
+  const { data: assessment } = await supabase
+    .from('assessments')
+    .select('*, students(name, mentors(name, email))')
+    .eq('id', assessmentId)
+    .single();
+
+  const student = assessment.students;
+  const mentor = student.mentors;
+
+  const { generatePostReflectionPdf } = require('./pdf');
+  const pdfBuffer = await generatePostReflectionPdf({
+    studentName: student.name,
+    mentorName: mentor.name,
+    round: assessment.round,
+    submittedAt: assessment.post_reflections_submitted_at,
+    answers: assessment.post_reflections || {},
+  });
+
+  const pdfDriveUrl = await drive.uploadBuffer(
+    pdfBuffer,
+    assessment.drive_folder_id,
+    `Mentoring Round ${assessment.round}. ${student.name}. Post-Meeting Reflection.pdf`,
+    'application/pdf'
+  );
+
+  await email.sendPostReflectionNotification({
+    mentorEmail: mentor.email,
+    mentorName: mentor.name,
     studentName: student.name,
     roundNum: assessment.round,
     pdfDriveUrl,
@@ -173,4 +219,4 @@ async function generateAndSendPdf(assessmentId) {
   return pdfDriveUrl;
 }
 
-module.exports = { processAssessment, generateAndSendPdf };
+module.exports = { processAssessment, generateAndSendPdf, savePostReflection };

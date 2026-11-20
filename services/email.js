@@ -42,7 +42,7 @@ async function sendStudentConfirmation({ studentEmail, studentName, roundNum, dr
   });
 }
 
-async function sendCompletionNotification({ mentorEmail, mentorName, studentEmail, studentName, roundNum, pdfDriveUrl }) {
+async function sendCompletionNotification({ mentorEmail, mentorName, studentEmail, studentName, roundNum, pdfDriveUrl, assessmentId, studentToken }) {
   const studentFirst = studentName.split(' ')[0];
   const client = getClient();
   await client.emails.send({
@@ -58,9 +58,24 @@ async function sendCompletionNotification({ mentorEmail, mentorName, studentEmai
       subject: `Your UCT Mentoring Round ${roundNum} Assessment is Ready`,
       html: `<p>Hi ${studentFirst},</p>
 <p>Your Round ${roundNum} assessment PDF is now complete and available to view.</p>
-<p><a href="${pdfDriveUrl}">Round ${roundNum} assessment PDF</a></p>`,
+<p><a href="${pdfDriveUrl}">Round ${roundNum} assessment PDF</a></p>
+<p><strong>Next step:</strong> reflect on your coaching session following the mentoring meeting.</p>
+<p><a href="${APP_URL()}/post-reflection.html?assessment_id=${assessmentId}&token=${studentToken}">Complete your Post-Meeting Reflection</a></p>`,
     });
   }
+}
+
+async function sendPostReflectionNotification({ mentorEmail, mentorName, studentName, roundNum, pdfDriveUrl }) {
+  const mentorFirst = mentorName.split(' ')[0];
+  const studentFirst = studentName.split(' ')[0];
+  await getClient().emails.send({
+    from: FROM(),
+    to: mentorEmail,
+    subject: `${studentName}'s Round ${roundNum} Post-Meeting Reflection`,
+    html: `<p>Hi ${mentorFirst},</p>
+<p>${studentFirst} has completed their Round ${roundNum} Post-Meeting Reflection.</p>
+<p><a href="${pdfDriveUrl}">View ${studentFirst}'s Post-Meeting Reflection</a></p>`,
+  });
 }
 
 async function sendMentorReminder({ mentorEmail, mentorName, studentName, roundNum, assessmentId, mentorToken, dashboardToken, mentorId, reminderNum }) {
@@ -98,4 +113,4 @@ async function sendAdminErrorAlert({ assessmentId, studentName, roundNum, errorM
   });
 }
 
-module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendMentorReminder, sendAdminErrorAlert };
+module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendPostReflectionNotification, sendMentorReminder, sendAdminErrorAlert };

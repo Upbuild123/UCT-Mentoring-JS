@@ -34,4 +34,10 @@ const MENTOR_QUESTIONS = [
   'Development practices: Which 1–2 development practices should the coach focus on for the next session?',
 ];
 
-module.exports = { RATING_OPTIONS, COMPETENCIES, REFLECTION_QUESTIONS, MENTOR_QUESTIONS };
+// Sent to the student after the mentor submits their feedback
+const POST_REFLECTION_QUESTIONS = [
+  'Strengths: What specific areas of your coaching did you demonstrate proficiency and growth?',
+  'Development areas: What are 2-3 skills for your continued development?',
+];
+
+module.exports = { RATING_OPTIONS, COMPETENCIES, REFLECTION_QUESTIONS, MENTOR_QUESTIONS, POST_REFLECTION_QUESTIONS };
