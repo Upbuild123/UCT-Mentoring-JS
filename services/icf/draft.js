@@ -6,6 +6,9 @@ const { verifyQuote, asText, cleanTimestamp } = require('./transcript');
 const { SYSTEM_PROMPT, contextMessage, competencyTask, feedbackTask, statementsSchema, FEEDBACK_SCHEMA } = require('./prompt');
 
 const MODEL = () => process.env.ICF_MODEL || 'gpt-5.5';
+// How much the model thinks before answering. 'medium' matched a mentor's ratings as well as 'high'
+// in testing at about a third of the output tokens; set ICF_REASONING_EFFORT=high to compare.
+const REASONING = () => process.env.ICF_REASONING_EFFORT || 'medium';
 
 // Upbuild skills that correspond to ICF Competencies 3–8
 const SKILL_TO_COMPETENCY = {
@@ -45,7 +48,7 @@ function addUsage(total, usage) {
 }
 
 function newUsage() {
-  return { model: MODEL(), calls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
+  return { model: MODEL(), reasoning: REASONING(), calls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
 }
 
 // Drafts are not needed instantly, so use OpenAI's discounted "flex" tier and fall back to the
@@ -64,7 +67,7 @@ async function createCompletion(client, request) {
 async function callModel(client, context, task, schema, usage, cacheKey) {
   const response = await createCompletion(client, {
     model: MODEL(),
-    reasoning_effort: 'high',
+    reasoning_effort: REASONING(),
     // Routes all of one draft's calls to the same cache so the shared context is reused
     prompt_cache_key: cacheKey,
     messages: [
