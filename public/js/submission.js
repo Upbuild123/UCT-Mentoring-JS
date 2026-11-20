@@ -1,4 +1,4 @@
-const RATING_OPTIONS = ['-- select --', '1. Not Demonstrated', '2. Emerging', '3. Competent', '4. Exceptional'];
+const RATING_OPTIONS = ['-- select --', 'Exceeds Standard', 'Meets Standard', 'Below Standard', 'Does Not Meet Standard'];
 const COMPETENCIES = [
   { name: 'Know Yourself', category: 'Meta-Skills', description: 'Uses self-knowledge and self-work to help the client discover who they are.' },
   { name: 'Experiment and Learn', category: 'Meta-Skills', description: 'Holds an experimental mindset, interacts with the client in new ways, and takes risks for the sake of the client.' },

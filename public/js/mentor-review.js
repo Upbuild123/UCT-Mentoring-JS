@@ -12,7 +12,7 @@ const COMPETENCIES = [
   { name: 'Facilitates Client Growth', category: 'Skills', description: 'Partners with the client to transform learning and insight into action. Promotes client autonomy in the coaching process.' },
 ];
 
-const RATING_OPTIONS = ['-- select --', '1. Not Demonstrated', '2. Emerging', '3. Competent', '4. Exceptional'];
+const RATING_OPTIONS = ['-- select --', 'Exceeds Standard', 'Meets Standard', 'Below Standard', 'Does Not Meet Standard'];
 
 const MENTOR_QUESTIONS = [
   'Strengths: What did the coach do well in this session?',

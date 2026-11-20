@@ -1,8 +1,8 @@
 const RATING_OPTIONS = [
-  '1. Not Demonstrated',
-  '2. Emerging',
-  '3. Competent',
-  '4. Exceptional',
+  'Exceeds Standard',
+  'Meets Standard',
+  'Below Standard',
+  'Does Not Meet Standard',
 ];
 
 const COMPETENCIES = [
