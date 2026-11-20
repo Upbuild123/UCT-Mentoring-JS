@@ -22,7 +22,7 @@ function decodeXml(s) {
 // Visible text of each paragraph in document order
 function docxParagraphs(documentXml) {
   const paragraphs = [];
-  for (const m of documentXml.matchAll(/<w:p[ >][\s\S]*?<\/w:p>/g)) {
+  for (const m of documentXml.matchAll(/<w:p(?: [^>]*[^\/])?>[\s\S]*?<\/w:p>/g)) {
     const text = [...m[0].matchAll(/<w:t(?: [^>]*)?>([^<]*)<\/w:t>|<w:tab\/>|<w:br\/>/g)]
       .map(t => (t[1] === undefined ? ' ' : decodeXml(t[1])))
       .join('')
@@ -71,4 +71,19 @@ async function loadReferences() {
   return cache;
 }
 
-module.exports = { loadReferences, docxParagraphs, decodeXml };
+let reviewCache = null;
+
+// The Competency Review Form, from the same private folder
+async function loadCompetencyReviewForm() {
+  if (reviewCache && Date.now() - reviewCache.loadedAt < CACHE_MS) return reviewCache;
+  const folderId = process.env.ICF_REFERENCE_FOLDER_ID;
+  if (!folderId) throw new Error('ICF_REFERENCE_FOLDER_ID is not set, so the ICF Competency Review Form cannot be found.');
+  const file = (await drive.listFiles(folderId)).find(f => /comp\w*tency.?review/i.test(f.name) && /\.docx$/i.test(f.name));
+  if (!file) throw new Error('Missing from the ICF reference folder: ICF Mentor Coaching Competency Review Form – ACC (.docx)');
+  const formBuffer = await drive.downloadFile(file.id);
+  const formXml = await (await JSZip.loadAsync(formBuffer)).file('word/document.xml').async('string');
+  reviewCache = { loadedAt: Date.now(), formBuffer, formParagraphs: docxParagraphs(formXml), fileName: file.name };
+  return reviewCache;
+}
+
+module.exports = { loadReferences, loadCompetencyReviewForm, docxParagraphs, decodeXml };

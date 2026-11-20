@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICF Competency Review — Upbuild</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .icf-flags { background: var(--orange-bg); border: 1px solid #EFDFC2; border-radius: var(--radius-sm); padding: 8px 12px; margin: 8px 0; color: var(--orange); font-size: 13px; }
+    .icf-flags ul { margin: 4px 0 0 18px; padding: 0; }
+    .icf-flags li { margin: 2px 0; }
+    .icf-statement { border-top: 1px solid var(--border-soft); padding-top: 16px; margin-top: 16px; }
+    .icf-statement:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+    .icf-statement h4 { margin: 0 0 8px; font-size: 15px; }
+    .icf-ratings { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 6px 0 10px; }
+    .icf-ratings label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+    .icf-starting { font-size: 12px; color: var(--gray); margin-bottom: 4px; }
+    .icf-competency-def { font-style: italic; color: var(--text-soft); font-size: 14px; }
+    .icf-block textarea { width: 100%; min-height: 110px; font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+    .icf-check { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; cursor: pointer; }
+    .icf-check input { margin-top: 4px; }
+    .icf-feedback-slot { border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 12px; margin: 10px 0; }
+    .icf-feedback-slot h4 { margin: 0 0 6px; font-size: 14px; }
+    .icf-statement-picks label { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; margin: 3px 0; cursor: pointer; }
+    .icf-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+    #save-status { font-size: 13px; color: var(--gray); }
+    .icf-summary-link { color: var(--purple); text-decoration: underline; cursor: pointer; }
+    .icf-threshold { border: 2px solid var(--gold); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 14px; }
+    .icf-log td input, .icf-log td select { width: 100%; }
+    .icf-readonly input, .icf-readonly textarea, .icf-readonly select { pointer-events: none; background: var(--bg); }
+  </style>
+</head>
+<body>
+  <header><a href="/"><img src="/images/upbuild-logo.png" alt="Upbuild" class="logo-img"></a></header>
+  <main>
+    <div class="page-header">
+      <h1 id="page-title">ICF Competency Review</h1>
+      <p class="text-gray" id="page-subtitle">Review the roll-up of the signed Session Observation Forms and the drafted feedback, make any changes, and sign.</p>
+    </div>
+    <div id="banner-area"></div>
+    <div id="status-area"></div>
+    <div id="content" style="display:none"></div>
+  </main>
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/competency-review.js?v=1"></script>
+</body>
+</html>

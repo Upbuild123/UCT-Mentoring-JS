@@ -129,7 +129,7 @@ router.get('/by-mentor/:mentor_id', requireDashboardAccess, async (req, res, nex
   try {
     const { data, error } = await supabase
       .from('assessments')
-      .select(`*, students!inner(name, mentor_id)`)
+      .select(`*, students!inner(name, mentor_id), icf_forms(status)`)
       .eq('students.mentor_id', req.params.mentor_id)
       .order('submitted_at', { ascending: false });
     if (error) throw error;

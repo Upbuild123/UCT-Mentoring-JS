@@ -114,6 +114,31 @@ async function sendIcfSigned({ mentorEmail, mentorName, studentEmail, studentNam
   }
 }
 
+async function sendCompetencyReviewSigned({ mentorEmail, studentEmail, studentName, pdfDriveUrl }) {
+  const studentFirst = studentName.split(' ')[0];
+  const client = getClient();
+  if (mentorEmail) {
+    await client.emails.send({
+      from: FROM(),
+      to: mentorEmail,
+      subject: `Signed ICF Competency Review. ${studentName}`,
+      html: `<p>The signed ICF Competency Review Form for ${studentFirst} has been saved and sent to ${studentFirst}.</p>
+<p><a href="${pdfDriveUrl}">View the signed Competency Review (PDF)</a></p>`,
+    });
+  }
+  if (studentEmail) {
+    await client.emails.send({
+      from: FROM(),
+      to: studentEmail,
+      subject: 'Your ICF Competency Review Form',
+      html: `<p>Hi ${studentFirst},</p>
+<p>Your mentor coach has signed your ICF Mentor Coaching Competency Review Form. It is saved in your Google Drive folder.</p>
+<p><a href="${pdfDriveUrl}">View your Competency Review Form (PDF)</a></p>
+<p>If you apply for an ICF credential, upload this form with your application.</p>`,
+    });
+  }
+}
+
 async function sendMentorReminder({ mentorEmail, mentorName, studentName, roundNum, assessmentId, mentorToken, dashboardToken, mentorId, reminderNum }) {
   const mentorFirst = mentorName.split(' ')[0];
   const studentFirst = studentName.split(' ')[0];
@@ -149,4 +174,4 @@ async function sendAdminErrorAlert({ assessmentId, studentName, roundNum, errorM
   });
 }
 
-module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendPostReflectionNotification, sendIcfDraftReady, sendIcfSigned, sendMentorReminder, sendAdminErrorAlert };
+module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendPostReflectionNotification, sendIcfDraftReady, sendIcfSigned, sendCompetencyReviewSigned, sendMentorReminder, sendAdminErrorAlert };

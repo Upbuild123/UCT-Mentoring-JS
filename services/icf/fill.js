@@ -104,7 +104,7 @@ async function fillIcfForm(formBuffer, structure, form) {
 
   // 1. Tick boxes, line by line: credential level, 3 self-review items, Q1, Q2, then A3.1–A8.3
   const boxParagraphs = [];
-  for (const m of xml.matchAll(/<w:p[ >][\s\S]*?<\/w:p>/g)) {
+  for (const m of xml.matchAll(/<w:p(?: [^>]*[^\/])?>[\s\S]*?<\/w:p>/g)) {
     if (paragraphText(m[0]).includes('☐')) boxParagraphs.push({ start: m.index, xml: m[0] });
   }
   if (boxParagraphs.length !== 6 + statements.length) {
@@ -171,7 +171,7 @@ async function fillIcfForm(formBuffer, structure, form) {
     ['Date Signed:', s.dateSigned],
   ];
   for (const [label, value] of lineValues) {
-    const m = [...xml.matchAll(/<w:p[ >][\s\S]*?<\/w:p>/g)]
+    const m = [...xml.matchAll(/<w:p(?: [^>]*[^\/])?>[\s\S]*?<\/w:p>/g)]
       .find(p => paragraphText(p[0]).replace(/&#8217;|&apos;/g, '’').replace(/\s+/g, ' ').trim().startsWith(label));
     if (!m) throw new Error(`The ICF form layout has changed ("${label}" not found).`);
     xml = xml.slice(0, m.index) + appendToParagraph(m[0], value) + xml.slice(m.index + m[0].length);
@@ -181,4 +181,4 @@ async function fillIcfForm(formBuffer, structure, form) {
   return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
 }
 
-module.exports = { fillIcfForm };
+module.exports = { fillIcfForm, tickBox, fillTextControl, appendToParagraph, paragraphText, balancedEnd, escapeXml, cleanRunProps, feedbackStatementLine, feedbackComments };

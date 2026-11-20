@@ -209,3 +209,8 @@ describe('transcript edge cases', () => {
     expect(verifyQuote(parsed, { timestamp: '[26:56]', speaker: 'Coach', quote: 'Can I just ask' }).status).toBe('ok');
   });
 });
+
+test('quotes in a transcript without timestamps verify cleanly', () => {
+  const parsed = parseTranscript('Coach: What would be valuable today?\nClient: My health.');
+  expect(verifyQuote(parsed, { timestamp: '', speaker: 'Coach', quote: 'What would be valuable today?' }).status).toBe('ok');
+});

@@ -15,6 +15,7 @@ app.use('/api/mentors', require('./routes/mentors'));
 app.use('/api/assessments', require('./routes/assessments'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/icf', require('./routes/icf'));
+app.use('/api/competency-review', require('./routes/competency-review'));
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 

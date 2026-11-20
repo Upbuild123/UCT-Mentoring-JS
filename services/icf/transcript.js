@@ -52,9 +52,10 @@ function verifyQuote(parsed, { timestamp, speaker, quote }) {
   timestamp = cleanTimestamp(timestamp);
   const matches = parsed.turns.filter(t => turnContains(t, quote));
   if (!matches.length) return { status: 'missing' };
-  const exact = matches.find(t => t.timestamp === timestamp && (!speaker || t.speaker === speaker));
+  const sameTimestamp = t => cleanTimestamp(t.timestamp) === timestamp;
+  const exact = matches.find(t => sameTimestamp(t) && (!speaker || t.speaker === speaker));
   if (exact) return { status: 'ok', turn: exact };
-  const sameTime = matches.find(t => t.timestamp === timestamp);
+  const sameTime = matches.find(sameTimestamp);
   if (sameTime) return { status: 'speaker', turn: sameTime };
   return { status: 'moved', turn: matches[0] };
 }

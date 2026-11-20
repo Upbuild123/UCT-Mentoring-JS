@@ -1,4 +1,9 @@
 const params = new URLSearchParams(location.search);
+
+function icfStatus(a) {
+  const icf = Array.isArray(a.icf_forms) ? a.icf_forms[0] : a.icf_forms;
+  return icf?.status || null;
+}
 const mentorId = params.get('mentor_id');
 const token = params.get('token');
 
@@ -75,7 +80,7 @@ if (!token) {
             <td><span class="badge ${badgeClass}">${badgeText}</span></td>
             <td style="display:flex;gap:6px;flex-wrap:wrap">
               <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}&token=${assessmentToken}">Review</a>
-              ${hasFeedback ? `<a class="btn btn-secondary btn-sm" href="/icf-review.html?assessment_id=${a.id}&token=${assessmentToken}">ICF Form</a>` : ''}
+              ${hasFeedback ? `<a class="btn btn-secondary btn-sm" href="/icf-review.html?assessment_id=${a.id}&token=${assessmentToken}">ICF Form${icfStatus(a) === 'signed' ? ' (signed)' : ''}</a>` : ''}
               ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">View PDF</a>` : ''}
               ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
             </td>`;
@@ -84,6 +89,22 @@ if (!token) {
         table.appendChild(tbody);
         wrapper.appendChild(table);
         details.appendChild(wrapper);
+
+        // The ICF Competency Review rolls up the engagement once 3 Session Observation Forms are signed
+        const signedCount = studentAssessments.filter(a => icfStatus(a) === 'signed').length;
+        const review = document.createElement('div');
+        review.className = 'mt-16';
+        if (signedCount >= 3) {
+          const link = document.createElement('a');
+          link.className = 'btn btn-primary btn-sm';
+          link.href = `/competency-review.html?student_id=${student.id}&mentor_id=${mentorId}&token=${token}`;
+          link.textContent = 'Competency Review';
+          review.appendChild(link);
+        } else {
+          review.className = 'mt-16 field-hint';
+          review.textContent = `ICF Competency Review: available once 3 ICF Session Observation Forms are signed (${signedCount} so far).`;
+        }
+        details.appendChild(review);
       }
 
       container.appendChild(details);
