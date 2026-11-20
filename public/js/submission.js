@@ -13,10 +13,9 @@ const COMPETENCIES = [
   { name: 'Facilitates Client Growth', category: 'Skills', description: 'Partners with the client to transform learning and insight into action. Promotes client autonomy in the coaching process.' },
 ];
 const REFLECTION_QUESTIONS = [
-  { q: 'What did you do well in this coaching session?', required: true },
-  { q: 'What opportunities were there to improve the coaching?', required: true },
-  { q: 'What are you learning about your style as a coach? How would your clients describe you?', required: true },
-  { q: 'What is your next developmental opportunity?', required: true },
+  { q: 'Strengths: What skills did you demonstrate proficiently?', required: true },
+  { q: 'Development areas: What areas do you believe you have opportunities for improvement or growth?', required: true },
+  { q: 'Style: What are you learning about your style as a coach?', required: true },
   { q: 'Questions you have about this session or coaching in general', required: false },
   { q: 'If your session is longer than 30 mins, which portion should your mentor listen to?', required: false, oneLine: true },
 ];

@@ -20,10 +20,9 @@ const COMPETENCIES = [
 ];
 
 const REFLECTION_QUESTIONS = [
-  'What did you do well in this coaching session?',
-  'What opportunities were there to improve the coaching?',
-  'What are you learning about your style as a coach? How would your clients describe you?',
-  'What is your next developmental opportunity?',
+  'Strengths: What skills did you demonstrate proficiently?',
+  'Development areas: What areas do you believe you have opportunities for improvement or growth?',
+  'Style: What are you learning about your style as a coach?',
   'Questions you have about this session or coaching in general',
   'If your session is longer than 30 mins, which portion should your mentor listen to?',
 ];
