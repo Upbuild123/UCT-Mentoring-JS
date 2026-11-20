@@ -1,13 +1,15 @@
 const COMPETENCIES = [
-  { name: 'Know Yourself', category: 'Meta-Skills' },
-  { name: 'Experiment and Learn', category: 'Meta-Skills' },
-  { name: 'Serve Not Fix', category: 'Meta-Skills' },
-  { name: 'Call on the Creative', category: 'Meta-Skills' },
-  { name: 'Co-Creating and Maintaining the Relationship', category: 'Skills' },
-  { name: 'Structuring the Coaching Session', category: 'Skills' },
-  { name: 'Listening', category: 'Skills' },
-  { name: 'Asking Curious and Powerful Questions', category: 'Skills' },
-  { name: 'Balancing Action and Learning', category: 'Skills' },
+  { name: 'Know Yourself', category: 'Meta-Skills', description: 'Uses self-knowledge and self-work to help the client discover who they are.' },
+  { name: 'Experiment and Learn', category: 'Meta-Skills', description: 'Holds an experimental mindset, interacts with the client in new ways, and takes risks for the sake of the client.' },
+  { name: 'Serve Not Fix', category: 'Meta-Skills', description: 'Focuses on coaching the whole person and their whole life, not the problem or issue; explores what it means to serve this client; avoids being an expert and advice-giver.' },
+  { name: 'Call on the Creative', category: 'Meta-Skills', description: 'Accesses and coaches from the Creative Level of Consciousness to help the client access and live from their Creative Consciousness.' },
+  { name: '10/80/10 Structure', category: 'Skills', description: 'Structures the session with an opening, extended exploration, and closing, making space for the client’s presenting, deeper, and transformational agendas.' },
+  { name: 'Establishes and Maintains Agreements', category: 'Skills', description: 'Partners with the client to clarify the session topic, desired outcome, and why it matters, then keeps the conversation connected to those agreements.' },
+  { name: 'Cultivates Trust and Safety', category: 'Skills', description: 'Partners with the client to create a safe, supportive environment that allows the client to share freely. Maintains a relationship of mutual respect and trust.' },
+  { name: 'Maintains Presence', category: 'Skills', description: 'Stays fully present with the client, remaining open, flexible, grounded, and confident as the conversation unfolds.' },
+  { name: 'Listens Actively', category: 'Skills', description: 'Listens without judgment to the client’s words, emotions, and underlying meaning to understand what the client is communicating.' },
+  { name: 'Evokes Awareness', category: 'Skills', description: 'Facilitates client insight and learning by using skills such as powerful questions, silence, metaphor, values, and visioning.' },
+  { name: 'Facilitates Client Growth', category: 'Skills', description: 'Partners with the client to transform learning and insight into action. Promotes client autonomy in the coaching process.' },
 ];
 
 const RATING_OPTIONS = ['-- select --', '1. Not Demonstrated', '2. Emerging', '3. Competent', '4. Exceptional'];
@@ -83,7 +85,7 @@ if (!token) {
         if (existingMentorRatings[comp.name] && opt === existingMentorRatings[comp.name]) o.selected = true;
         select.appendChild(o);
       }
-      tr.innerHTML = `<td>${comp.name}</td><td>${coachRatings[comp.name] || '—'}</td><td></td>`;
+      tr.innerHTML = `<td>${comp.name}<p class="field-hint" style="margin:4px 0 0">${comp.description}</p></td><td>${coachRatings[comp.name] || '—'}</td><td></td>`;
       tr.lastElementChild.appendChild(select);
       tbody.appendChild(tr);
     }

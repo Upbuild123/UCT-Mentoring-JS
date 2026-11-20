@@ -40,8 +40,9 @@ function generatePdf({ assessment, studentName, mentorName, feedbackText, mentor
         : 'N/A'],
     ];
     for (const [label, value] of metaLines) {
-      doc.font('Helvetica-Bold').fontSize(9).fillColor(GRAY).text(label, 50, doc.y, { continued: true, width: 100 });
-      doc.font('Helvetica').fillColor(DARK_TEXT).text(value);
+      const y = doc.y;
+      doc.font('Helvetica-Bold').fontSize(9).fillColor(GRAY).text(label, 50, y, { width: 100 });
+      doc.font('Helvetica').fillColor(DARK_TEXT).text(value, 150, y, { width: pageWidth - 100 });
     }
 
     function sectionHeading(text) {
@@ -58,36 +59,40 @@ function generatePdf({ assessment, studentName, mentorName, feedbackText, mentor
     const colComp = pageWidth * 0.52;
     const colSide = pageWidth * 0.24;
     const rowH = 16;
+    const textInset = 4;
 
-    doc.rect(50, doc.y, pageWidth, rowH).fill(LIGHT_PURPLE);
-    doc.font('Helvetica-Bold').fontSize(9).fillColor(PURPLE);
-    const headerY = doc.y - rowH + 4;
-    doc.text('Competency', 54, headerY, { width: colComp });
-    doc.text('Coach', 54 + colComp, headerY, { width: colSide });
-    doc.text('Mentor', 54 + colComp + colSide, headerY, { width: colSide });
-    doc.y += 2;
+    // Each row is drawn at a fixed y, then y moves down a full row height
+    let y = doc.y;
+    function row(cells, { bg, font, color }) {
+      doc.rect(50, y, pageWidth, rowH).fill(bg);
+      doc.font(font).fontSize(9).fillColor(color);
+      for (const [text, x, width] of cells) doc.text(text, x, y + textInset, { width, lineBreak: false });
+      y += rowH;
+    }
+
+    row([
+      ['Competency', 54, colComp],
+      ['Coach', 54 + colComp, colSide],
+      ['Mentor', 54 + colComp + colSide, colSide],
+    ], { bg: LIGHT_PURPLE, font: 'Helvetica-Bold', color: PURPLE });
 
     let fill = false;
     let currentCategory = null;
     for (const comp of COMPETENCIES) {
       if (comp.category !== currentCategory) {
         currentCategory = comp.category;
-        doc.rect(50, doc.y, pageWidth, rowH).fill('#F8F5FF');
-        doc.font('Helvetica-Bold').fontSize(9).fillColor(PURPLE)
-          .text(`  ${currentCategory}`, 54, doc.y - rowH + 4, { width: pageWidth });
-        doc.y += 2;
+        row([[`  ${currentCategory}`, 54, pageWidth]], { bg: '#F8F5FF', font: 'Helvetica-Bold', color: PURPLE });
         fill = false;
       }
-      const bg = fill ? '#FAF8FF' : '#FFFFFF';
-      doc.rect(50, doc.y, pageWidth, rowH).fill(bg);
-      const rowY = doc.y - rowH + 4;
-      doc.font('Helvetica').fontSize(9).fillColor(DARK_TEXT)
-        .text(`  ${comp.name}`, 54, rowY, { width: colComp });
-      doc.text(String(coachRatings[comp.name] || '—'), 54 + colComp, rowY, { width: colSide });
-      doc.text(String(mentorRatings[comp.name] || '—'), 54 + colComp + colSide, rowY, { width: colSide });
-      doc.y += 2;
+      row([
+        [`  ${comp.name}`, 54, colComp],
+        [String(coachRatings[comp.name] || '—'), 54 + colComp, colSide],
+        [String(mentorRatings[comp.name] || '—'), 54 + colComp + colSide, colSide],
+      ], { bg: fill ? '#FAF8FF' : '#FFFFFF', font: 'Helvetica', color: DARK_TEXT });
       fill = !fill;
     }
+    doc.x = 50;
+    doc.y = y;
 
     // Coach Reflections
     sectionHeading('Coach Reflections');
