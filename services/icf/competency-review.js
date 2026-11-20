@@ -5,7 +5,7 @@ const OpenAI = require('openai');
 const { parseTranscript, asText, normalize } = require('./transcript');
 const { tickBox, fillTextControl, appendToParagraph, paragraphText, balancedEnd, escapeXml, cleanRunProps, feedbackStatementLine, feedbackComments } = require('./fill');
 const { LEVELS } = require('./structure');
-const { statementIds, addUsage, newUsage } = require('./draft');
+const { statementIds, addUsage, newUsage, createCompletion } = require('./draft');
 
 const DEMONSTRATED = 'Proficiency Demonstrated';
 const NOT_YET = 'Proficiency Not Yet Demonstrated';
@@ -221,7 +221,7 @@ async function draftCompetencyReview({ structure, sessions, admin, pendingRounds
   if (!roll.ethicsAllObserved) review.ethics.push({ type: 'ethics', message: 'At least one signed Session Observation Form marked an ethics qualifier Not Observed. Review before verifying ethics.' });
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const response = await client.chat.completions.create({
+  const response = await createCompletion(client, {
     model: process.env.ICF_MODEL || 'gpt-5.5',
     reasoning_effort: 'high',
     messages: [
@@ -230,7 +230,7 @@ async function draftCompetencyReview({ structure, sessions, admin, pendingRounds
       { role: 'user', content: 'Draft the Competency 1 notes, the Cumulative Feedback (2-3 strengths and 2-3 development areas), and notes for the mentor.' },
     ],
     response_format: { type: 'json_schema', json_schema: FEEDBACK_SCHEMA },
-  }, { timeout: 15 * 60 * 1000 });
+  });
   const ai = JSON.parse(response.choices[0].message.content);
   const usage = newUsage();
   addUsage(usage, response.usage);

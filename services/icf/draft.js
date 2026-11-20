@@ -48,8 +48,21 @@ function newUsage() {
   return { model: MODEL(), calls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
 }
 
+// Drafts are not needed instantly, so use OpenAI's discounted "flex" tier and fall back to the
+// standard tier if flex capacity is unavailable
+async function createCompletion(client, request) {
+  try {
+    return await client.chat.completions.create({ ...request, service_tier: 'flex' }, { timeout: 15 * 60 * 1000, maxRetries: 2 });
+  } catch (err) {
+    if (err.status === 429 || err.status >= 500 || err.name === 'APIConnectionTimeoutError') {
+      return client.chat.completions.create(request, { timeout: 15 * 60 * 1000 });
+    }
+    throw err;
+  }
+}
+
 async function callModel(client, context, task, schema, usage, cacheKey) {
-  const response = await client.chat.completions.create({
+  const response = await createCompletion(client, {
     model: MODEL(),
     reasoning_effort: 'high',
     // Routes all of one draft's calls to the same cache so the shared context is reused
@@ -60,7 +73,7 @@ async function callModel(client, context, task, schema, usage, cacheKey) {
       { role: 'user', content: task },
     ],
     response_format: { type: 'json_schema', json_schema: schema },
-  }, { timeout: 15 * 60 * 1000 });
+  });
   addUsage(usage, response.usage);
   return JSON.parse(response.choices[0].message.content);
 }
@@ -226,4 +239,4 @@ async function draftIcfForm({ structure, references, parsed, mentor, admin }) {
   return result;
 }
 
-module.exports = { draftIcfForm, assembleDraft, mentorInputs, statementIds, addUsage, newUsage, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };
+module.exports = { draftIcfForm, assembleDraft, mentorInputs, statementIds, addUsage, newUsage, createCompletion, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };

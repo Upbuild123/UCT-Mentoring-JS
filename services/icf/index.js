@@ -37,12 +37,12 @@ async function loadAssessment(assessmentId) {
   return data;
 }
 
-// Skips a form the mentor has already edited or signed unless forced (the mentor's Regenerate button)
+// Drafts once per round; re-saving the Upbuild form does not redraft (each draft costs a few dollars).
+// The mentor's Regenerate button forces a new draft.
 async function generateIcfDraft(assessmentId, { force = false } = {}) {
   const existing = await getRow(assessmentId);
   if (existing?.status === 'signed') return;
-  if (existing?.status === 'generating' && !force) return;
-  if (existing?.edited && !force) return;
+  if (existing && existing.status !== 'error' && !force) return;
 
   await saveRow(assessmentId, { status: 'generating', error_message: null });
   let assessment;

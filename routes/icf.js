@@ -57,7 +57,8 @@ router.post('/:assessmentId/generate', requireMentorAccess, async (req, res, nex
     const id = parseInt(req.params.assessmentId);
     const row = await icf.getRow(id);
     if (row?.status === 'signed') return res.status(409).json({ error: 'This form is already signed.' });
-    if (row?.status === 'generating') return res.status(409).json({ error: 'A draft is already being generated.' });
+    // A draft interrupted by a server restart stays 'generating'; allow a retry after 30 minutes
+    if (row?.status === 'generating' && Date.now() - new Date(row.updated_at).getTime() < 30 * 60 * 1000) return res.status(409).json({ error: 'A draft is already being generated.' });
     icf.generateIcfDraft(id, { force: true }).catch(err =>
       console.error(`ICF draft failed for assessment ${id}:`, err)
     );

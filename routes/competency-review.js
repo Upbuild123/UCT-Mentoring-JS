@@ -63,7 +63,7 @@ router.post('/:studentId/generate', requireStudentMentor, async (req, res, next)
     const id = parseInt(req.params.studentId);
     const [row, status] = await Promise.all([workflow.getReview(id), workflow.engagementStatus(id)]);
     if (row?.status === 'signed') return res.status(409).json({ error: 'This Competency Review is already signed.' });
-    if (row?.status === 'generating') return res.status(409).json({ error: 'A draft is already being generated.' });
+    if (row?.status === 'generating' && Date.now() - new Date(row.updated_at).getTime() < 30 * 60 * 1000) return res.status(409).json({ error: 'A draft is already being generated.' });
     if (!status.canGenerate) return res.status(409).json({ error: `The Competency Review needs at least 3 signed ICF Session Observation Forms; ${status.signedForms} so far.` });
     workflow.generateCompetencyReview(id).catch(err => console.error(`Competency Review draft failed for student ${id}:`, err));
     res.status(202).json({ success: true });

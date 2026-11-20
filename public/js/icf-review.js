@@ -285,6 +285,9 @@ async function load() {
         ? 'The AI draft has not been started. It is created after you submit the Upbuild mentor form.'
         : 'The AI is drafting the ICF form from your Upbuild form and the transcript. This usually takes a few minutes; this page will update on its own.'));
     if (data.status === 'none') status.appendChild(el('button', { class: 'btn btn-primary', text: 'Generate the ICF draft now', onclick: regenerate }));
+    else status.appendChild(el('p', { class: 'field-hint' },
+      'If this has not finished after 30 minutes, ',
+      el('a', { href: '#', text: 'start it again', onclick: e => { e.preventDefault(); regenerate(); } }), '.'));
     setTimeout(() => load().catch(() => {}), 15000);
     return;
   }
