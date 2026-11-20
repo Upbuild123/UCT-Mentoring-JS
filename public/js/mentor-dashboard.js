@@ -75,6 +75,7 @@ if (!token) {
             <td><span class="badge ${badgeClass}">${badgeText}</span></td>
             <td style="display:flex;gap:6px;flex-wrap:wrap">
               <a class="btn btn-secondary btn-sm" href="/mentor-review.html?assessment_id=${a.id}&token=${assessmentToken}">Review</a>
+              ${hasFeedback ? `<a class="btn btn-secondary btn-sm" href="/icf-review.html?assessment_id=${a.id}&token=${assessmentToken}">ICF Form</a>` : ''}
               ${a.pdf_drive_url ? `<a class="btn btn-secondary btn-sm" href="${a.pdf_drive_url}" target="_blank">View PDF</a>` : ''}
               ${a.drive_folder_url ? `<a class="btn btn-secondary btn-sm" href="${a.drive_folder_url}" target="_blank">Drive</a>` : ''}
             </td>`;

@@ -153,4 +153,40 @@ async function uploadBuffer(buffer, folderId, driveFileName, mimeType) {
   return getWebLink(drive, res.data.id);
 }
 
-module.exports = { getStudentMentoringFolder, uploadedSince, uploadFile, uploadBuffer };
+async function listFiles(folderId) {
+  return listFolderFiles(await getDrive(), folderId);
+}
+
+async function downloadFile(fileId) {
+  const drive = await getDrive();
+  const res = await drive.files.get(
+    { fileId, alt: 'media', supportsAllDrives: true },
+    { responseType: 'arraybuffer' }
+  );
+  return Buffer.from(res.data);
+}
+
+// Google converts the Word file to a Google Doc, exports it as PDF, then the temporary Doc is deleted
+async function convertDocxToPdf(docxBuffer, name) {
+  const drive = await getDrive();
+  const { Readable } = require('stream');
+  const tmp = await drive.files.create({
+    requestBody: { name: `${name} (temporary)`, mimeType: 'application/vnd.google-apps.document' },
+    media: {
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      body: Readable.from(docxBuffer),
+    },
+    fields: 'id',
+  });
+  try {
+    const res = await drive.files.export(
+      { fileId: tmp.data.id, mimeType: 'application/pdf' },
+      { responseType: 'arraybuffer' }
+    );
+    return Buffer.from(res.data);
+  } finally {
+    await drive.files.delete({ fileId: tmp.data.id }).catch(() => {});
+  }
+}
+
+module.exports = { getStudentMentoringFolder, uploadedSince, uploadFile, uploadBuffer, listFiles, downloadFile, convertDocxToPdf };

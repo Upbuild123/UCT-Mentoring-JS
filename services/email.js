@@ -78,6 +78,42 @@ async function sendPostReflectionNotification({ mentorEmail, mentorName, student
   });
 }
 
+async function sendIcfDraftReady({ mentorEmail, mentorName, studentName, roundNum, assessmentId, mentorToken }) {
+  const mentorFirst = mentorName.split(' ')[0];
+  const studentFirst = studentName.split(' ')[0];
+  await getClient().emails.send({
+    from: FROM(),
+    to: mentorEmail,
+    subject: `ICF Observation Form Draft Ready. ${studentName}. Round ${roundNum}`,
+    html: `<p>Hi ${mentorFirst},</p>
+<p>The AI has drafted ${studentFirst}'s Round ${roundNum} ICF Mentor Coaching Session Observation Form (ACC) from your Upbuild form and the session transcript.</p>
+<p><a href="${APP_URL()}/icf-review.html?assessment_id=${assessmentId}&token=${mentorToken}">Review, edit and sign the ICF form</a></p>
+<p>Items the AI was unsure about are flagged for you. Nothing is shared with ${studentFirst} until you sign.</p>`,
+  });
+}
+
+async function sendIcfSigned({ mentorEmail, mentorName, studentEmail, studentName, roundNum, pdfDriveUrl }) {
+  const studentFirst = studentName.split(' ')[0];
+  const client = getClient();
+  await client.emails.send({
+    from: FROM(),
+    to: mentorEmail,
+    subject: `Signed ICF Observation Form. ${studentName}. Round ${roundNum}`,
+    html: `<p>The signed Round ${roundNum} ICF Session Observation Form for ${studentFirst} has been saved and sent to ${studentFirst}.</p>
+<p><a href="${pdfDriveUrl}">View the signed ICF form (PDF)</a></p>`,
+  });
+  if (studentEmail) {
+    await client.emails.send({
+      from: FROM(),
+      to: studentEmail,
+      subject: `Your Round ${roundNum} ICF Session Observation Form`,
+      html: `<p>Hi ${studentFirst},</p>
+<p>Your mentor coach has signed your Round ${roundNum} ICF Mentor Coaching Session Observation Form. It is saved in your Google Drive folder.</p>
+<p><a href="${pdfDriveUrl}">View your ICF Session Observation Form (PDF)</a></p>`,
+    });
+  }
+}
+
 async function sendMentorReminder({ mentorEmail, mentorName, studentName, roundNum, assessmentId, mentorToken, dashboardToken, mentorId, reminderNum }) {
   const mentorFirst = mentorName.split(' ')[0];
   const studentFirst = studentName.split(' ')[0];
@@ -113,4 +149,4 @@ async function sendAdminErrorAlert({ assessmentId, studentName, roundNum, errorM
   });
 }
 
-module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendPostReflectionNotification, sendMentorReminder, sendAdminErrorAlert };
+module.exports = { sendMentorNotification, sendStudentConfirmation, sendCompletionNotification, sendPostReflectionNotification, sendIcfDraftReady, sendIcfSigned, sendMentorReminder, sendAdminErrorAlert };

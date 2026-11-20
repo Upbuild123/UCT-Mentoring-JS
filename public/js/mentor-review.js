@@ -165,7 +165,11 @@ if (!token) {
       localStorage.removeItem(DRAFT_KEY);
       const success = document.getElementById('submit-success');
       success.style.display = 'block';
-      success.textContent = 'Feedback submitted. The assessment PDF is being generated and will be emailed to both you and the coach.';
+      success.textContent = 'Feedback submitted. The assessment PDF is being generated and will be emailed to both you and the coach. The AI is also drafting the ICF Session Observation Form; you will get an email when it is ready to review. ';
+      const icfLink = document.createElement('a');
+      icfLink.href = `/icf-review.html?assessment_id=${assessmentId}&token=${token}`;
+      icfLink.textContent = 'Open the ICF form';
+      success.appendChild(icfLink);
     } catch (err) {
       document.getElementById('submit-btn').disabled = false;
       showBanner(bannerArea, err.message);

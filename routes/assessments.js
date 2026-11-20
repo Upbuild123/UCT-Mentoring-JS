@@ -70,6 +70,7 @@ router.post('/submit', upload.single('video'), async (req, res, next) => {
 
     if (existing) {
       await supabase.from('ai_reviews').delete().eq('assessment_id', existing.id);
+      await supabase.from('icf_forms').delete().eq('assessment_id', existing.id);
       await supabase.from('mentor_feedback').delete().eq('assessment_id', existing.id);
       await supabase.from('assessments').delete().eq('id', existing.id);
     }
@@ -185,6 +186,9 @@ router.post('/:id/mentor-feedback', requireMentorAccess, async (req, res, next) 
     generateAndSendPdf(parseInt(req.params.id)).catch(err =>
       console.error(`PDF generation failed for assessment ${req.params.id}:`, err)
     );
+    require('../services/icf').generateIcfDraft(parseInt(req.params.id)).catch(err =>
+      console.error(`ICF draft failed for assessment ${req.params.id}:`, err)
+    );
 
     res.json({ success: true });
   } catch (err) {
@@ -283,7 +287,7 @@ router.post('/:id/regenerate-ai-review', requireAdmin, async (req, res, next) =>
 router.delete('/:id', requireAdmin, async (req, res, next) => {
   try {
     // Child rows reference the assessment without ON DELETE CASCADE, so remove them first
-    for (const table of ['mentor_feedback', 'ai_reviews']) {
+    for (const table of ['mentor_feedback', 'ai_reviews', 'icf_forms']) {
       const { error } = await supabase.from(table).delete().eq('assessment_id', req.params.id);
       if (error) throw error;
     }
