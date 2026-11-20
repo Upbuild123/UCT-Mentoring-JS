@@ -71,6 +71,17 @@ async function loadReferences() {
   return cache;
 }
 
+// Splits a guide into its general part and one section per competency. The guide's table of
+// contents repeats the headings, so the last heading for each competency starts its section.
+function sectionsByCompetency(text) {
+  const starts = {};
+  for (const m of text.matchAll(/^Competency (\d): .*$/gm)) starts[m[1]] = m.index;
+  const order = Object.entries(starts).sort((a, b) => a[1] - b[1]);
+  const sections = {};
+  order.forEach(([n, at], i) => { sections[n] = text.slice(at, i + 1 < order.length ? order[i + 1][1] : text.length).trim(); });
+  return { general: order.length ? text.slice(0, order[0][1]).trim() : text, sections };
+}
+
 let reviewCache = null;
 
 // The Competency Review Form, from the same private folder
@@ -86,4 +97,4 @@ async function loadCompetencyReviewForm() {
   return reviewCache;
 }
 
-module.exports = { loadReferences, loadCompetencyReviewForm, docxParagraphs, decodeXml };
+module.exports = { loadReferences, loadCompetencyReviewForm, sectionsByCompetency, docxParagraphs, decodeXml };

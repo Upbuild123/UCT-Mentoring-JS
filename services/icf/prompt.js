@@ -95,7 +95,14 @@ CONSISTENCY CHECK BEFORE ANSWERING
 CONFIDENTIALITY
 Treat transcript content as confidential; use it only for the form.`;
 
+const { sectionsByCompetency } = require('./reference');
+
+// Shared by every call for a session, so OpenAI can reuse it: the general parts of the guides
+// (and Competencies 1-2), the feedback guide, the mentor's form and the transcript
 function contextMessage({ references, structure, transcriptText, hasTimestamps, mentor }) {
+  const bars = sectionsByCompetency(references.bars);
+  const minimum = sectionsByCompetency(references.minimumSkills);
+  const general = (guide) => [guide.general, guide.sections[1], guide.sections[2]].filter(Boolean).join('\n\n');
   const statements = structure.competencies
     .map(c => [
       `Competency ${c.number}: ${c.name}`,
@@ -114,14 +121,14 @@ ${statements}
 Rating scale:
 ${structure.ratingDefinitions.join('\n')}
 
-=== ACC BARS RESOURCE GUIDE ===
-${references.bars}
+=== ACC BARS RESOURCE GUIDE: GENERAL PRINCIPLES, RATING SCALE, COMPETENCIES 1-2 ===
+${general(bars)}
 
 === EVALUATION FEEDBACK GUIDE ===
 ${references.feedbackGuide}
 
-=== ACC MINIMUM SKILLS REQUIREMENTS ===
-${references.minimumSkills}
+=== ACC MINIMUM SKILLS REQUIREMENTS: GENERAL, COMPETENCIES 1-2 ===
+${general(minimum)}
 
 === MENTOR COACH'S UPBUILD FORM ===
 Competency ratings (starting points):
@@ -141,8 +148,17 @@ ${transcriptText}
 === END OF TRANSCRIPT ===`;
 }
 
-function competencyTask(competency, mentorRating) {
-  return `Draft Competency ${competency.number}: ${competency.name}.
+// Only this competency's sections of the BARS guide and Minimum Skills go with its call
+function competencyTask(competency, mentorRating, references) {
+  const bars = sectionsByCompetency(references.bars).sections[competency.number] || '';
+  const minimum = sectionsByCompetency(references.minimumSkills).sections[competency.number] || '';
+  return `=== ACC BARS RESOURCE GUIDE: COMPETENCY ${competency.number} ===
+${bars}
+
+=== ACC MINIMUM SKILLS REQUIREMENTS: COMPETENCY ${competency.number} ===
+${minimum}
+
+Draft Competency ${competency.number}: ${competency.name}.
 The mentor coach rated this competency: ${mentorRating || '(not rated)'}.
 Return one entry for each of these statements, in this order:
 ${competency.statements.map(s => `${s.id} ${s.text}`).join('\n')}`;

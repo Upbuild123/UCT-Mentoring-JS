@@ -35,10 +35,25 @@ function mentorInputs(feedback) {
   };
 }
 
-async function callModel(client, context, task, schema) {
+function addUsage(total, usage) {
+  if (!usage) return;
+  total.calls += 1;
+  total.inputTokens += usage.prompt_tokens || 0;
+  total.cachedInputTokens += usage.prompt_tokens_details?.cached_tokens || 0;
+  total.outputTokens += usage.completion_tokens || 0;
+  total.reasoningTokens += usage.completion_tokens_details?.reasoning_tokens || 0;
+}
+
+function newUsage() {
+  return { model: MODEL(), calls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
+}
+
+async function callModel(client, context, task, schema, usage, cacheKey) {
   const response = await client.chat.completions.create({
     model: MODEL(),
     reasoning_effort: 'high',
+    // Routes all of one draft's calls to the same cache so the shared context is reused
+    prompt_cache_key: cacheKey,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: context },
@@ -46,6 +61,7 @@ async function callModel(client, context, task, schema) {
     ],
     response_format: { type: 'json_schema', json_schema: schema },
   }, { timeout: 15 * 60 * 1000 });
+  addUsage(usage, response.usage);
   return JSON.parse(response.choices[0].message.content);
 }
 
@@ -192,16 +208,22 @@ async function draftIcfForm({ structure, references, parsed, mentor, admin }) {
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const context = contextMessage({ references, structure, transcriptText: asText(parsed), hasTimestamps: parsed.hasTimestamps, mentor });
 
+  const usage = newUsage();
+  const cacheKey = `icf-draft-${require('crypto').randomUUID()}`;
   const rated = structure.competencies.filter(c => c.statements.length);
-  const perCompetency = await Promise.all(rated.map(c =>
-    callModel(client, context, competencyTask(c, mentor.competencyRatings[c.number]), statementsSchema(c.statements.map(s => s.id)))
-  ));
-  const statementResults = perCompetency.flatMap(r => r.statements);
+  const draftCompetency = c => callModel(client, context, competencyTask(c, mentor.competencyRatings[c.number], references), statementsSchema(c.statements.map(s => s.id)), usage, cacheKey);
+  // The first call stores the shared context in OpenAI's cache; the rest then reuse it at a lower price
+  const first = await draftCompetency(rated[0]);
+  const rest = await Promise.all(rated.slice(1).map(draftCompetency));
+  const statementResults = [first, ...rest].flatMap(r => r.statements);
 
   const drafts = statementResults.map(s => ({ id: s.id, rating: s.rating, evidence: s.evidence_groups, comment: s.comment }));
-  const feedbackResult = await callModel(client, context, feedbackTask(drafts), FEEDBACK_SCHEMA);
+  const feedbackResult = await callModel(client, context, feedbackTask(drafts), FEEDBACK_SCHEMA, usage, cacheKey);
 
-  return assembleDraft({ structure, parsed, mentor, admin, statementResults, feedbackResult });
+  const result = assembleDraft({ structure, parsed, mentor, admin, statementResults, feedbackResult });
+  result.review.usage = usage;
+  console.log('ICF draft OpenAI usage:', JSON.stringify(usage));
+  return result;
 }
 
-module.exports = { draftIcfForm, assembleDraft, mentorInputs, statementIds, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };
+module.exports = { draftIcfForm, assembleDraft, mentorInputs, statementIds, addUsage, newUsage, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };

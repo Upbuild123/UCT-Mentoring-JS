@@ -5,7 +5,7 @@ const OpenAI = require('openai');
 const { parseTranscript, asText, normalize } = require('./transcript');
 const { tickBox, fillTextControl, appendToParagraph, paragraphText, balancedEnd, escapeXml, cleanRunProps, feedbackStatementLine, feedbackComments } = require('./fill');
 const { LEVELS } = require('./structure');
-const { statementIds } = require('./draft');
+const { statementIds, addUsage, newUsage } = require('./draft');
 
 const DEMONSTRATED = 'Proficiency Demonstrated';
 const NOT_YET = 'Proficiency Not Yet Demonstrated';
@@ -232,6 +232,10 @@ async function draftCompetencyReview({ structure, sessions, admin, pendingRounds
     response_format: { type: 'json_schema', json_schema: FEEDBACK_SCHEMA },
   }, { timeout: 15 * 60 * 1000 });
   const ai = JSON.parse(response.choices[0].message.content);
+  const usage = newUsage();
+  addUsage(usage, response.usage);
+  review.usage = usage;
+  console.log('Competency Review OpenAI usage:', JSON.stringify(usage));
 
   const strengths = {};
   const development = {};
