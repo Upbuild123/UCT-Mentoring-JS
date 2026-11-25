@@ -105,7 +105,7 @@ Use exactly these six sections, in this order, each with a ## markdown heading. 
 
 ## Strengths
 
-3 to 4 strengths. Anchor each one with at least one verbatim quote from the transcript, and add a second or third when it shows the coach doing it more than once. For each, use exactly this shape:
+Exactly 4 strengths. Anchor each one with at least one verbatim quote from the transcript, and add a second or third when it shows the coach doing it more than once. For each, use exactly this shape:
 
 ### [Short title]
 
@@ -117,7 +117,7 @@ One or two sentences on what the coach did and its effect on the client.
 
 ## Development Areas
 
-3 to 4 development areas, focusing on patterns that showed up more than once. For each, use exactly this shape, with no quote:
+Exactly 4 development areas, focusing on patterns that showed up more than once. For each, use exactly this shape, with no quote:
 
 ### [Short title]
 
