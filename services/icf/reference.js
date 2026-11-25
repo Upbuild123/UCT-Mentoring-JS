@@ -1,8 +1,23 @@
-// Loads the ICF form and reference guides from a private Drive folder.
-// They are © ICF, so they are kept out of this (public) repository.
+// Loads the ICF forms and reference guides from a private Supabase Storage bucket.
+// They are © ICF, so they are kept out of this (public) repository, and out of Google Drive so that
+// nothing read through the Workspace APIs is sent to the AI.
 const JSZip = require('jszip');
 const pdfParse = require('pdf-parse/lib/pdf-parse.js');
-const drive = require('../drive');
+const supabase = require('../supabase');
+
+const BUCKET = () => process.env.ICF_REFERENCE_BUCKET || 'icf-reference';
+
+async function listFiles() {
+  const { data, error } = await supabase.storage.from(BUCKET()).list('', { limit: 100 });
+  if (error) throw new Error(`Could not read the ICF reference bucket "${BUCKET()}": ${error.message}`);
+  return data;
+}
+
+async function downloadFile(name) {
+  const { data, error } = await supabase.storage.from(BUCKET()).download(name);
+  if (error) throw new Error(`Could not download ${name} from the ICF reference bucket: ${error.message}`);
+  return Buffer.from(await data.arrayBuffer());
+}
 
 const CACHE_MS = 6 * 60 * 60 * 1000;
 let cache = null;
@@ -36,10 +51,7 @@ function docxParagraphs(documentXml) {
 async function loadReferences() {
   if (cache && Date.now() - cache.loadedAt < CACHE_MS) return cache;
 
-  const folderId = process.env.ICF_REFERENCE_FOLDER_ID;
-  if (!folderId) throw new Error('ICF_REFERENCE_FOLDER_ID is not set, so the ICF form and reference guides cannot be found.');
-
-  const files = await drive.listFiles(folderId);
+  const files = await listFiles();
   const missing = [];
   const found = {};
   for (const [key, doc] of Object.entries(DOCUMENTS)) {
@@ -48,11 +60,11 @@ async function loadReferences() {
     else missing.push(doc.label);
   }
   if (missing.length) {
-    throw new Error(`Missing from the ICF reference folder: ${missing.join('; ')}`);
+    throw new Error(`Missing from the ICF reference bucket: ${missing.join('; ')}`);
   }
 
   const [formBuffer, barsBuffer, feedbackBuffer, minimumBuffer] = await Promise.all(
-    ['form', 'bars', 'feedbackGuide', 'minimumSkills'].map(k => drive.downloadFile(found[k].id))
+    ['form', 'bars', 'feedbackGuide', 'minimumSkills'].map(k => downloadFile(found[k].name))
   );
   const formXml = await (await JSZip.loadAsync(formBuffer)).file('word/document.xml').async('string');
   const [bars, feedbackGuide, minimumSkills] = await Promise.all(
@@ -87,11 +99,9 @@ let reviewCache = null;
 // The Competency Review Form, from the same private folder
 async function loadCompetencyReviewForm() {
   if (reviewCache && Date.now() - reviewCache.loadedAt < CACHE_MS) return reviewCache;
-  const folderId = process.env.ICF_REFERENCE_FOLDER_ID;
-  if (!folderId) throw new Error('ICF_REFERENCE_FOLDER_ID is not set, so the ICF Competency Review Form cannot be found.');
-  const file = (await drive.listFiles(folderId)).find(f => /comp\w*tency.?review/i.test(f.name) && /\.docx$/i.test(f.name));
-  if (!file) throw new Error('Missing from the ICF reference folder: ICF Mentor Coaching Competency Review Form – ACC (.docx)');
-  const formBuffer = await drive.downloadFile(file.id);
+  const file = (await listFiles()).find(f => /comp\w*tency.?review/i.test(f.name) && /\.docx$/i.test(f.name));
+  if (!file) throw new Error('Missing from the ICF reference bucket: ICF Mentor Coaching Competency Review Form – ACC (.docx)');
+  const formBuffer = await downloadFile(file.name);
   const formXml = await (await JSZip.loadAsync(formBuffer)).file('word/document.xml').async('string');
   reviewCache = { loadedAt: Date.now(), formBuffer, formParagraphs: docxParagraphs(formXml), fileName: file.name };
   return reviewCache;
