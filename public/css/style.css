@@ -516,3 +516,57 @@ details .table-wrapper { margin-top: var(--space-1); }
   .tabs { gap: 0; }
   .tab { padding: var(--space-2) var(--space-3); font-size: 13px; }
 }
+
+/* ============================================================
+   AI analysis (mentor only)
+   ============================================================ */
+.analysis-section {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 22px 26px 8px;
+  margin-bottom: 20px;
+}
+#review-content .analysis-section h2 {
+  margin: 0 0 14px;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--purple);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#review-content .analysis-section h2::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--purple);
+}
+#review-content .analysis-section h3 {
+  margin: 18px 0 6px;
+  font-size: 16px;
+  color: var(--purple-dark);
+}
+#review-content .analysis-section h3:first-of-type { margin-top: 4px; }
+#review-content .analysis-section p { color: var(--text); line-height: 1.65; }
+#review-content blockquote {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid #CDB9E8;
+  background: var(--light-purple);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-soft);
+  font-style: italic;
+}
+#review-content blockquote p { margin: 0; color: var(--text-soft); }
+#review-content .analysis-section ul { list-style: none; padding: 0; }
+#review-content .analysis-section li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+  line-height: 1.6;
+}
+#review-content .analysis-section li:last-child { border-bottom: none; }
+#review-content .analysis-section li strong { display: inline; margin: 0; color: var(--purple-dark); }

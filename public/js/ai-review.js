@@ -1,4 +1,17 @@
 const params = new URLSearchParams(location.search);
+
+// Wrap each ## section of the analysis in its own card
+function groupSections(container) {
+  let card = null;
+  for (const node of [...container.childNodes]) {
+    if (node.nodeName === 'H2') {
+      card = document.createElement('section');
+      card.className = 'analysis-section';
+      container.insertBefore(card, node);
+    }
+    if (card) card.appendChild(node);
+  }
+}
 const assessmentId = params.get('assessment_id');
 const token = params.get('token');
 
@@ -12,7 +25,9 @@ if (!token) {
     document.getElementById('caption').textContent = `${data.students.name} — Round ${data.round}`;
 
     const content = data.ai_reviews?.[0]?.content || '(No AI review available)';
-    document.getElementById('review-content').innerHTML = marked.parse(content);
+    const target = document.getElementById('review-content');
+    target.innerHTML = marked.parse(content);
+    groupSections(target);
 
     const baseName = `Mentoring Round ${data.round}. ${data.students.name}. AI Review`;
 

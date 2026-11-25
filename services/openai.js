@@ -89,32 +89,53 @@ ${transcript}
 
 ## OUTPUT STRUCTURE
 
-Use exactly these five sections, in this order, each with a ## markdown heading. Use a blank line between paragraphs and lists.
+Use exactly these five sections, in this order, each with a ## markdown heading. Use a blank line between every element.
 
 ## Strengths
 
-3 to 4 strengths. For each: a short bold title, then one or two sentences on what the coach did and its effect on the client, with a brief quote.
+3 to 4 strengths. For each, use exactly this shape:
+
+### [Short title]
+
+One or two sentences on what the coach did and its effect on the client.
+
+> "Brief verbatim quote" (timestamp if available)
 
 ## Development Areas
 
-3 to 4 development areas. For each: a short bold title, then one or two sentences on what happened and what it limited, with a brief quote. Focus on patterns that showed up more than once.
+3 to 4 development areas, focusing on patterns that showed up more than once. For each, use exactly this shape:
+
+### [Short title]
+
+One or two sentences on what happened and what it limited.
+
+> "Brief verbatim quote" (timestamp if available)
 
 ## Client Agendas
 
-One or two lines each:
-- *Presenting agenda:* what the client wants to work on and the outcome they want.
-- *Deeper agenda:* what is underneath it and why it matters to the client.
-- *Transformational agenda:* who the client is becoming.
+Exactly these three lines, one or two sentences each:
+
+- **Presenting:** what the client wants to work on and the outcome they want.
+- **Deeper:** what is underneath it and why it matters to the client.
+- **Transformational:** who the client is becoming.
 
 Then one sentence on which level the coach mostly worked at.
 
 ## Possible Practices
 
-2 to 3 concrete practices the coach can try in the next session, each phrased as an in-session action (for example, "When the client..., ask..."). No books, courses, or general advice.
+2 to 3 concrete practices the coach can try in the next session. For each:
+
+### [Short title]
+
+The practice phrased as an in-session action (for example, "When the client..., ask..."). No books, courses, or general advice.
 
 ## Key Moments
 
-2 to 3 moments with the most potential for the client (identity, values, fear, assumptions, meaning). For each: the client's words, what the coach did, and where the coaching could have gone.
+2 to 3 moments with the most potential for the client (identity, values, fear, assumptions, meaning). For each, only a title and the client's words, with no commentary:
+
+### [Short title]
+
+> "The client's words" (timestamp if available)
 
 ---
 
