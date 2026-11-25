@@ -9,6 +9,10 @@ const { parseTranscript } = require('./transcript');
 const { draftIcfForm, mentorInputs } = require('./draft');
 const { fillIcfForm } = require('./fill');
 
+function formatDate(value) {
+  return value ? new Date(value).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+}
+
 async function getStructure() {
   const references = await loadReferences();
   return { references, structure: parseFormStructure(references.formParagraphs) };
@@ -30,7 +34,7 @@ async function saveRow(assessmentId, fields) {
 async function loadAssessment(assessmentId) {
   const { data, error } = await supabase
     .from('assessments')
-    .select('id, round, transcript, mentor_token, drive_folder_id, students(name, email, mentors(id, name, email, dashboard_token)), mentor_feedback(feedback_text, mentor_ratings)')
+    .select('id, round, transcript, mentor_token, drive_folder_id, submitted_at, students(name, email, mentors(id, name, email, dashboard_token)), mentor_feedback(feedback_text, mentor_ratings, submitted_at)')
     .eq('id', assessmentId)
     .single();
   if (error) throw error;
@@ -68,9 +72,10 @@ async function generateIcfDraft(assessmentId, { force = false } = {}) {
         mentorEmail: mentor.email || '',
         clientName: student.name || '',
         clientEmail: student.email || '',
-        sessionDate: '',
-        mentorSessionDate: '',
-        level: '',
+        // Assumed from when the recording and the mentor's form were submitted; the mentor can edit both
+        sessionDate: formatDate(assessment.submitted_at),
+        mentorSessionDate: formatDate(feedback.submitted_at),
+        level: 'ACC',
       },
     });
 

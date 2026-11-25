@@ -109,37 +109,42 @@ describe('assembling the draft', () => {
     expect(form.signoff.signature).toBe('');
   });
 
-  test('flags invented quotes and corrects a misplaced timestamp', () => {
+  test('flags invented quotes and quietly corrects a misplaced timestamp', () => {
     const results = allIds.map(id => statementResult(id));
     results[0] = statementResult('A3.1', { evidence_groups: [{ label: '', items: [
       { timestamp: '00:05', speaker: 'Client', quote: 'plan my new role' },
       { timestamp: '00:12', speaker: 'Client', quote: 'something the client never said' },
     ] }] });
     const { form, review } = build(results);
-    const messages = review.statements['A3.1'].flags.map(f => f.message).join(' ');
-    expect(messages).toContain('Corrected where a quote appears');
-    expect(messages).toContain('Quote not found word for word');
+    const flags = review.statements['A3.1'].flags;
+    expect(flags).toHaveLength(1);
+    expect(flags[0].message).toContain('Quote not found word for word');
     expect(form.statements['A3.1'].evidence).toContain('Client (00:12): "plan my new role"');
   });
 
-  test('flags a rating that differs from the mentor’s starting rating', () => {
+  test('a rating that differs from the mentor’s keeps its reason without a warning', () => {
     const results = allIds.map(id => statementResult(id));
-    results[2] = statementResult('A3.3', { rating: 'Below Standard', missing_or_instead: 'No question about importance.' });
+    results[2] = statementResult('A3.3', { rating: 'Below Standard', rating_reason: 'No question about importance.' });
     const { review } = build(results);
-    expect(review.statements['A3.3'].flags.map(f => f.type)).toContain('differs');
+    expect(review.statements['A3.3']).toMatchObject({ startingRating: 'Meets Standard', aiRating: 'Below Standard', reason: 'No question about importance.', flags: [] });
   });
 
-  test('flags comment timestamps that are not in the evidence', () => {
-    const results = allIds.map(id => statementResult(id, { comment: 'See 12:34.' }));
+  test('borderline ratings are flagged; recording checks become one note at the top', () => {
+    const results = allIds.map(id => statementResult(id));
+    results[0] = statementResult('A3.1', { borderline_alternative: 'Below Standard', borderline_note: 'Close call.' });
+    results[13] = statementResult(allIds[13], { verify_against_recording: 'silence' });
     const { review } = build(results);
-    expect(review.statements['A3.1'].flags.map(f => f.type)).toContain('consistency');
+    expect(review.statements['A3.1'].flags[0].message).toContain('Borderline: Meets Standard or Below Standard');
+    expect(review.general.join(' ')).toContain(`check ${allIds[13]}`);
+    expect(Object.values(review.statements).flatMap(s => s.flags)).toHaveLength(1);
   });
 
-  test('notes missing timestamps and missing admin details', () => {
+  test('notes missing timestamps; admin defaults need no warnings', () => {
     const { form, review } = build(allIds.map(id => statementResult(id, { evidence_groups: [{ label: '', items: [{ timestamp: '', speaker: 'Coach', quote: 'Hi.' }] }] })), feedbackResult, 'Coach: Hi.\nClient: Hello.');
     expect(form.statements['A3.1'].evidence.startsWith(NO_TIMESTAMPS)).toBe(true);
     expect(review.general.join(' ')).toContain('no timestamps');
-    expect(review.general.join(' ')).toContain('Level of the mentor coaching services provider');
+    expect(review.general.join(' ')).not.toContain('Administrative information');
+    expect(form.selfReview).toEqual([true, true, true]);
   });
 
   test('flags fewer than 2 strengths and a statement in both sections', () => {

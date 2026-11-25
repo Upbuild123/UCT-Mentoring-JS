@@ -90,7 +90,6 @@ async function callModel(client, context, task, schema, usage, cacheKey) {
   return JSON.parse(response.choices[0].message.content);
 }
 
-const TIMESTAMP_IN_TEXT = /\b\d{1,2}:\d{1,2}(?::\d{2})?\b/g;
 
 // The model sometimes returns "A3.2 Coach and client..." instead of "A3.2"
 function statementIds(list) {
@@ -114,7 +113,6 @@ function formatEvidence(s, hasTimestamps) {
   return `${lines.join('\n')}\n\nComment: ${comment}`;
 }
 
-const PROHIBITED = /\b(must|needs to|need to|you should|completely missed|great coaching|nice work|pass(ed|es)?|fail(ed|s)?|ready for (the )?(acc|pcc|mcc|credential)|credential[- ]ready)\b/i;
 
 // Turns the model's answers into the editable form plus the review notes the mentor sees
 function assembleDraft({ structure, parsed, mentor, admin, statementResults, feedbackResult }) {
@@ -123,12 +121,9 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
   const general = [];
   const review = { statements: {}, ethics: [], feedback: [], general };
 
-  if (!hasTimestamps) general.push(`The transcript has no timestamps, so each evidence field says "${NO_TIMESTAMPS}" and quotes could not be located by time.`);
-  for (const [label, value] of [
-    ['Date of Client’s Coaching Session', admin.sessionDate],
-    ['Date of Mentor Coaching Session', admin.mentorSessionDate],
-    ['Level of the mentor coaching services provider', admin.level],
-  ]) if (!value) general.push(`Administrative information needed: ${label} is not stored in the app. Please fill it in.`);
+  // Warnings are kept to the judgment calls a mentor must make; routine checks the app can fix itself stay silent
+  if (!hasTimestamps) general.push(`The transcript has no timestamps, so each evidence field says "${NO_TIMESTAMPS}"`);
+  const toVerify = [];
 
   const formStatements = {};
   const byId = Object.fromEntries(statementResults.map(s => [s.id, s]));
@@ -136,7 +131,6 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
     const s = byId[st.id];
     const flags = [];
     const starting = mentor.competencyRatings[st.competency] || '';
-    if (!starting) flags.push({ type: 'input', message: `The mentor's Upbuild form has no ICF-scale rating for Competency ${st.competency}, so this rating comes from the transcript alone.` });
     if (!s) {
       formStatements[st.id] = { rating: '', evidence: '' };
       review.statements[st.id] = { startingRating: starting, aiRating: '', flags: [...flags, { type: 'missing', message: 'The AI did not return a draft for this statement. Please complete it.' }] };
@@ -151,32 +145,23 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
         if (check.status === 'missing') {
           flags.push({ type: 'quote', message: `Quote not found word for word in the transcript: "${item.quote}"${item.timestamp ? ` (${item.timestamp})` : ''}. Check or remove it.` });
         } else if (check.status === 'moved' || check.status === 'speaker') {
-          const was = `${item.speaker} ${item.timestamp || ''}`.trim();
           item.timestamp = check.turn.timestamp || item.timestamp;
           item.speaker = check.turn.speaker || item.speaker;
-          flags.push({ type: 'quote', message: `Corrected where a quote appears (was ${was}, now ${item.speaker} ${item.timestamp || ''}): "${item.quote}".` });
         }
         if (!hasTimestamps) item.timestamp = '';
       }
     }
 
     if (!s.evidence_groups.some(g => g.items.length)) flags.push({ type: 'evidence', message: 'No transcript evidence was listed. Add evidence or confirm the rating.' });
-    if (starting && s.rating !== starting) flags.push({ type: 'differs', message: `Your Competency ${st.competency} rating was ${starting}; the draft rates this behavior ${s.rating}. ${s.rating_reason}` });
-    if (s.borderline_alternative && s.borderline_alternative !== s.rating) flags.push({ type: 'borderline', message: `Borderline ${s.rating} / ${s.borderline_alternative}. ${s.borderline_note}` });
-    if (s.verify_against_recording) flags.push({ type: 'verify', message: `Verify against the recording: ${s.verify_against_recording}` });
-    if (s.confidence === 'low') flags.push({ type: 'confidence', message: `Low confidence in this rating. ${s.rating_reason}` });
+    if (s.borderline_alternative && s.borderline_alternative !== s.rating) flags.push({ type: 'borderline', message: `Borderline: ${s.rating} or ${s.borderline_alternative}. ${s.borderline_note}` });
     if (s.rating === 'N/A') flags.push({ type: 'na', message: 'Rated N/A. ICF allows this only in rare cases where there was no opportunity to demonstrate the behavior. Please confirm.' });
-    if (['Below Standard', 'Does Not Meet Standard'].includes(s.rating) && !s.missing_or_instead) flags.push({ type: 'evidence', message: 'Rated below Meets, but the draft does not say what was missing or happened instead.' });
-    if (hasTimestamps) {
-      const evidenceTimes = new Set(s.evidence_groups.flatMap(g => g.items.map(i => i.timestamp)));
-      const stray = [...new Set((s.comment.match(TIMESTAMP_IN_TEXT) || []))].filter(t => !evidenceTimes.has(t));
-      if (stray.length) flags.push({ type: 'consistency', message: `The comment cites ${stray.join(', ')}, which is not in the evidence list.` });
-    }
-    if (PROHIBITED.test(s.comment)) flags.push({ type: 'wording', message: 'The comment may use prescriptive or pass/fail wording. Please review.' });
+    if (s.verify_against_recording) toVerify.push(st.id);
 
     formStatements[st.id] = { rating: s.rating, evidence: formatEvidence(s, hasTimestamps) };
-    review.statements[st.id] = { startingRating: starting, aiRating: s.rating, reason: s.rating_reason, confidence: s.confidence, flags };
+    // Shown beside "your rating" when the draft rates the behavior differently, not as a warning
+    review.statements[st.id] = { startingRating: starting, aiRating: s.rating, reason: s.rating_reason, flags };
   }
+  if (toVerify.length) general.push(`A transcript can't show silence, tone, or how interruptions landed. When you listen to the recording, check ${toVerify.join(', ')}.`);
 
   // Observation Feedback: one slot per competency in each section
   const ratingOf = id => formStatements[id]?.rating;
@@ -208,18 +193,15 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
   for (const id of strengthIds) {
     if (['Below Standard', 'Does Not Meet Standard'].includes(ratingOf(id))) review.feedback.push({ type: 'alignment', message: `${id} is listed as a strength but is rated ${ratingOf(id)}.` });
   }
-  const feedbackText = [...Object.values(strengths), ...Object.values(development)].map(i => i.comments).join('\n');
-  if (PROHIBITED.test(feedbackText.replace(/\(suggested wording\)/gi, ''))) review.feedback.push({ type: 'wording', message: 'The feedback may use prescriptive or pass/fail wording. Please review.' });
 
   // Ethics: no mentor answers are collected, so both default to Observed; concerns are shown to the mentor
   const { ethics } = feedbackResult;
   if (ethics.q1_concern) review.ethics.push({ type: 'concern', message: `Possible Code of Ethics concern (Q1): ${ethics.q1_concern}` });
   if (ethics.q2_concern) review.ethics.push({ type: 'concern', message: `Possible coach-role concern (Q2): ${ethics.q2_concern}` });
-  for (const note of feedbackResult.notes_for_mentor) general.push(note);
 
   const form = {
     admin,
-    selfReview: [false, false, false],
+    selfReview: [true, true, true],
     ethics: { q1: 'Observed', q2: 'Observed', comments: ethics.comment, standard: '' },
     statements: formStatements,
     strengths,

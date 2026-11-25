@@ -163,6 +163,7 @@ function renderCompetencies(s) {
         return el('div', { class: 'icf-statement', id: `st-${st.id.replace('.', '-')}` },
           el('h4', { text: `${st.id} ${st.text}` }),
           r.startingRating ? el('div', { class: 'icf-starting', text: `Your Competency ${c.number} rating on the Upbuild form: ${r.startingRating}${r.aiRating ? ` · AI draft: ${r.aiRating}` : ''}` }) : null,
+          r.startingRating && r.aiRating && r.aiRating !== r.startingRating && r.reason ? el('div', { class: 'icf-starting', text: `Why the draft differs: ${r.reason}` }) : null,
           radioGroup(`rating-${st.id}`, s.ratingOptions, v.rating, val => { v.rating = val; }),
           flagBox(statementFlags(st.id)),
           el('div', { class: 'form-group icf-block' }, el('label', { text: 'Evidence of Behavior:' }), textArea(v.evidence, val => { v.evidence = val; })));

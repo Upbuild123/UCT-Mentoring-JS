@@ -262,8 +262,8 @@ async function draftCompetencyReview({ structure, sessions, admin, pendingRounds
   ai.notes_for_mentor.forEach(n => general.push(n));
 
   const form = {
-    admin: { ...admin, level: levels.length === 1 ? levels[0] : '', observedSessions: String(sessions.length) },
-    selfReview: [false, false, false],
+    admin: { ...admin, level: levels.length === 1 ? levels[0] : 'ACC', observedSessions: String(sessions.length) },
+    selfReview: [true, true, true],
     sessionLog: sessions.slice(0, LOG_ROWS).map(x => ({
       session: `Session ${x.number} (Round ${x.round})`,
       date: x.form.admin?.mentorSessionDate || '',
