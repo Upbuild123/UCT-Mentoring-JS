@@ -92,26 +92,17 @@ async function sendIcfDraftReady({ mentorEmail, mentorName, studentName, roundNu
   });
 }
 
-async function sendIcfSigned({ mentorEmail, mentorName, studentEmail, studentName, roundNum, pdfDriveUrl }) {
-  const studentFirst = studentName.split(' ')[0];
-  const client = getClient();
-  await client.emails.send({
+// Students do not receive their session observation forms; only the mentor is told
+async function sendIcfSigned({ mentorEmail, mentorName, studentName, roundNum, pdfDriveUrl }) {
+  const mentorFirst = mentorName.split(' ')[0];
+  await getClient().emails.send({
     from: FROM(),
     to: mentorEmail,
     subject: `Signed ICF Observation Form. ${studentName}. Round ${roundNum}`,
-    html: `<p>The signed Round ${roundNum} ICF Session Observation Form for ${studentFirst} has been saved and sent to ${studentFirst}.</p>
+    html: `<p>Hi ${mentorFirst},</p>
+<p>The signed Round ${roundNum} ICF Session Observation Form for ${studentName} has been saved to the faculty ICF Observation Forms folder. It has not been sent to the student.</p>
 <p><a href="${pdfDriveUrl}">View the signed ICF form (PDF)</a></p>`,
   });
-  if (studentEmail) {
-    await client.emails.send({
-      from: FROM(),
-      to: studentEmail,
-      subject: `Your Round ${roundNum} ICF Session Observation Form`,
-      html: `<p>Hi ${studentFirst},</p>
-<p>Your mentor coach has signed your Round ${roundNum} ICF Mentor Coaching Session Observation Form. It is saved in your Google Drive folder.</p>
-<p><a href="${pdfDriveUrl}">View your ICF Session Observation Form (PDF)</a></p>`,
-    });
-  }
 }
 
 async function sendCompetencyReviewSigned({ mentorEmail, studentEmail, studentName, pdfDriveUrl }) {

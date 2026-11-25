@@ -163,20 +163,23 @@ async function signIcfForm(assessmentId, form) {
     throw err;
   }
 
+  // Signed observation forms are kept in a faculty-only folder, not the student's folder
+  const facultyFolderId = process.env.ICF_FORMS_FOLDER_ID;
+  if (!facultyFolderId) throw new Error('ICF_FORMS_FOLDER_ID is not set, so there is nowhere to save the signed ICF form.');
+
   const assessment = await loadAssessment(assessmentId);
   const student = assessment.students;
   const mentor = student.mentors;
   const name = `Mentoring Round ${assessment.round}. ${student.name}. ICF Session Observation Form`;
   const docx = await buildDocx(form);
   const pdf = await drive.convertDocxToPdf(docx, name);
-  const pdfDriveUrl = await drive.uploadBuffer(pdf, assessment.drive_folder_id, `${name}.pdf`, 'application/pdf');
+  const pdfDriveUrl = await drive.uploadBuffer(pdf, facultyFolderId, `${name}.pdf`, 'application/pdf');
 
   await saveRow(assessmentId, { status: 'signed', form, signed_at: new Date().toISOString(), pdf_drive_url: pdfDriveUrl });
 
   await email.sendIcfSigned({
     mentorEmail: mentor.email,
     mentorName: mentor.name,
-    studentEmail: student.email || '',
     studentName: student.name,
     roundNum: assessment.round,
     pdfDriveUrl,

@@ -204,7 +204,7 @@ function renderSignoff(s) {
   const signBtn = el('button', { class: 'btn btn-primary', text: 'Approve and sign' });
   signBtn.addEventListener('click', async () => {
     problemsArea.innerHTML = '';
-    if (!confirm('Sign this ICF form? It will be locked, saved as a PDF to the student’s Drive folder, and emailed to the student.')) return;
+    if (!confirm('Sign this ICF form? It will be locked and saved as a PDF to the faculty ICF Observation Forms folder. It is not sent to the student.')) return;
     signBtn.disabled = true;
     signBtn.textContent = 'Signing…';
     clearTimeout(saveTimer);
