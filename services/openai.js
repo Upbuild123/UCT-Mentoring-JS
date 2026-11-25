@@ -121,11 +121,9 @@ Then one sentence on which level the coach mostly worked at.
 
 ## Possible Practices
 
-2 to 3 concrete practices the coach can try in the next session. For each:
+2 to 3 practices the coach can focus on in the next session. Keep each one short and general, a habit to build rather than a scripted question, in the style of: "Clarify the presenting agenda before moving into exploration," "Pause after each question to give the client room to reflect," or "Ask the client what they are taking away before closing." No sample questions, books, courses, or general advice. Use a bulleted list, one sentence per practice, with no titles:
 
-### [Short title]
-
-The practice phrased as an in-session action (for example, "When the client..., ask..."). No books, courses, or general advice.
+- [Practice]
 
 ## Key Moments
 
