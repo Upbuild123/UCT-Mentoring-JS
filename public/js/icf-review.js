@@ -86,6 +86,11 @@ function radioGroup(name, options, current, onChange) {
   }));
 }
 
+function hasFlags() {
+  const r = data.review || {};
+  return Object.values(r.statements || {}).some(v => v.flags?.length) || !!(r.general?.length || r.ethics?.length || r.feedback?.length);
+}
+
 function statementFlags(id) {
   return data.review?.statements?.[id]?.flags || [];
 }
@@ -231,7 +236,7 @@ function renderSignoff(s) {
     el('p', { class: 'field-hint', text: 'The AI never signs or attests for you. Confirm each statement yourself after reviewing the form with your mentor coaching client.' }),
     el('p', { text: 'By signing, I attest to the following:' }),
     s.attestations.map((a, i) => checkRow(so.attestations[i], a, v => { so.attestations[i] = v; })),
-    checkRow(so.flagsReviewed, 'I have reviewed every item the AI flagged and made any needed changes.', v => { so.flagsReviewed = v; }),
+    hasFlags() ? checkRow(so.flagsReviewed, 'I have reviewed every item the AI flagged and made any needed changes.', v => { so.flagsReviewed = v; }) : null,
     el('div', { class: 'form-group' }, el('label', { text: s.signatureLabels[0] }), textInput(so.printedName, v => { so.printedName = v; })),
     el('div', { class: 'form-group' }, el('label', { text: `${s.signatureLabels[1]} (type your full name)` }), textInput(so.signature, v => { so.signature = v; })),
     el('div', { class: 'form-group' }, el('label', { text: s.signatureLabels[2] }), textInput(so.dateSigned, v => { so.dateSigned = v; }, { placeholder: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) })),
