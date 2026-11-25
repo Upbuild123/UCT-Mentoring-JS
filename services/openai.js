@@ -105,13 +105,15 @@ Use exactly these five sections, in this order, each with a ## markdown heading.
 
 ## Strengths
 
-3 to 4 strengths. For each, use exactly this shape:
+3 to 4 strengths. Anchor each one with at least one verbatim quote from the transcript, and add a second or third when it shows the coach doing it more than once. For each, use exactly this shape:
 
 ### [Short title]
 
 One or two sentences on what the coach did and its effect on the client.
 
 > "Brief verbatim quote" (timestamp if available)
+
+> "Another brief verbatim quote, if it helps" (timestamp if available)
 
 ## Development Areas
 
