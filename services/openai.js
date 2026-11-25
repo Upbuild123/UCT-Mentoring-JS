@@ -101,7 +101,11 @@ ${transcript}
 
 ## OUTPUT STRUCTURE
 
-Use exactly these five sections, in this order, each with a ## markdown heading. Use a blank line between every element.
+Use exactly these six sections, in this order, each with a ## markdown heading. Use a blank line between every element.
+
+## Coaching Style
+
+One line only: 3 to 5 words or short phrases that capture the coach's style in this session, separated by commas (for example: warm, curious, upbeat, edgy).
 
 ## Strengths
 
