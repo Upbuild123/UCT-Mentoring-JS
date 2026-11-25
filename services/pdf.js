@@ -15,13 +15,6 @@ const HAIRLINE = '#ECE8F0';
 const MARGIN = 56;
 const BODY = 10.5;
 
-// Rating badges: the leading number on the Upbuild scale, or the ICF word
-const BADGES = [
-  { match: /^4|^Exceeds/i, fill: '#E3F3EA', text: '#1F7A4D' },
-  { match: /^3|^Meets/i, fill: '#EFE8F8', text: PURPLE },
-  { match: /^2|^Below/i, fill: '#FCF1DD', text: '#92600C' },
-  { match: /^1|^Does Not/i, fill: '#FBEAE9', text: '#B3261E' },
-];
 
 function newDocument(resolve, reject) {
   const chunks = [];
@@ -72,16 +65,16 @@ function sectionHeading(doc, text) {
   doc.y += 10;
 }
 
+// Every rating gets the same soft purple badge
 function badge(doc, text, x, centerY) {
-  const style = BADGES.find(b => b.match.test(text));
-  if (!style) {
-    doc.font('Helvetica').fontSize(9.5).fillColor(GRAY).text(text, x, centerY - 5, { lineBreak: false });
+  if (!text || text === '—') {
+    doc.font('Helvetica').fontSize(9.5).fillColor(GRAY).text('—', x, centerY - 5, { lineBreak: false });
     return;
   }
   doc.font('Helvetica-Bold').fontSize(8.5);
   const w = doc.widthOfString(text) + 16;
-  doc.roundedRect(x, centerY - 9, w, 18, 9).fill(style.fill);
-  doc.fillColor(style.text).text(text, x + 8, centerY - 4, { lineBreak: false });
+  doc.roundedRect(x, centerY - 9, w, 18, 9).fill('#EFE8F8');
+  doc.fillColor(PURPLE).text(text, x + 8, centerY - 4, { lineBreak: false });
 }
 
 function ratingsTable(doc, coachRatings, mentorRatings) {
