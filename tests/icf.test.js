@@ -159,12 +159,12 @@ describe('assembling the draft', () => {
 });
 
 describe('mentor inputs', () => {
-  test('maps the six Upbuild skills to Competencies 3–8 and ignores old labels', () => {
+  test('maps the six Upbuild skills to Competencies 3–8 and converts the 1-4 scale to ICF ratings', () => {
     const m = mentorInputs({
-      mentor_ratings: { 'Establishes and Maintains Agreements': 'Meets Standard', 'Listens Actively': '3. Competent', '10/80/10 Structure': 'Exceeds Standard' },
+      mentor_ratings: { 'Establishes and Maintains Agreements': '4. Exceptional', 'Listens Actively': '2. Emerging', 'Evokes Awareness': 'something else', '10/80/10 Structure': '3. Competent' },
       feedback_text: { 'Strengths: What did the coach do well in this session?': 'Good questions', 'Development areas: What opportunities were there to improve the coaching?': 'Silence' },
     });
-    expect(m.competencyRatings).toEqual({ 3: 'Meets Standard' });
+    expect(m.competencyRatings).toEqual({ 3: 'Exceeds Standard', 6: 'Below Standard' });
     expect(m.strengths).toBe('Good questions');
     expect(m.development).toBe('Silence');
   });

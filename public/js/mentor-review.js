@@ -12,7 +12,7 @@ const COMPETENCIES = [
   { name: 'Facilitates Client Growth', category: 'Skills', description: 'Partners with the client to transform learning and insight into action. Promotes client autonomy in the coaching process.' },
 ];
 
-const RATING_OPTIONS = ['-- select --', 'Exceeds Standard', 'Meets Standard', 'Below Standard', 'Does Not Meet Standard'];
+const RATING_OPTIONS = ['-- select --', '1. Not Demonstrated', '2. Emerging', '3. Competent', '4. Exceptional'];
 
 const MENTOR_QUESTIONS = [
   'Strengths: What did the coach do well in this session?',
@@ -58,8 +58,7 @@ if (!token) {
   async function init() {
     const data = await apiFetch(`/api/assessments/${assessmentId}?token=${token}`);
     const student = data.students;
-    const date = data.submitted_at ? new Date(data.submitted_at).toLocaleDateString() : '';
-    document.getElementById('page-title').textContent = `Coach: ${student.name} — Round ${data.round} (${date})`;
+    document.getElementById('page-title').textContent = `Coach: ${student.name} — Round ${data.round}`;
     document.getElementById('content').style.display = 'block';
 
     const coachRatings = data.competency_ratings || {};
@@ -94,8 +93,7 @@ if (!token) {
     Object.entries(data.reflections || {}).forEach(([q, a], i) => {
       const div = document.createElement('div');
       div.className = 'card';
-      const fontSize = i < 2 ? '1.5em' : i >= 3 ? '0.5em' : '1em';
-      div.innerHTML = `<label style="margin-bottom:6px">${q}</label><p style="color:var(--text-soft);font-size:${fontSize}">${a || '(no answer)'}</p>`;
+      div.innerHTML = `<label style="margin-bottom:6px">${q}</label><p style="color:var(--text-soft)">${a || '(no answer)'}</p>`;
       reflContainer.appendChild(div);
     });
 
@@ -128,6 +126,7 @@ if (!token) {
       const textarea = document.createElement('textarea');
       textarea.dataset.question = q;
       textarea.className = 'mentor-feedback-textarea';
+      if (/^(Strengths|Development areas):/.test(q)) textarea.style.minHeight = '180px';
       textarea.value = existingFeedback[q] || '';
       textarea.addEventListener('input', saveMentorDraft);
       div.appendChild(label);
@@ -165,11 +164,7 @@ if (!token) {
       localStorage.removeItem(DRAFT_KEY);
       const success = document.getElementById('submit-success');
       success.style.display = 'block';
-      success.textContent = 'Feedback submitted. The assessment PDF is being generated and will be emailed to both you and the coach. The AI is also drafting the ICF Session Observation Form; you will get an email when it is ready to review. ';
-      const icfLink = document.createElement('a');
-      icfLink.href = `/icf-review.html?assessment_id=${assessmentId}&token=${token}`;
-      icfLink.textContent = 'Open the ICF form';
-      success.appendChild(icfLink);
+      success.textContent = 'Feedback submitted. The assessment PDF is being generated and will be emailed to both you and the coach. The AI is also drafting the ICF Session Observation Form; you will get an email when it is ready to review.';
     } catch (err) {
       document.getElementById('submit-btn').disabled = false;
       showBanner(bannerArea, err.message);

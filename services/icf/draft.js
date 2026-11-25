@@ -22,13 +22,22 @@ const SKILL_TO_COMPETENCY = {
 
 const NO_TIMESTAMPS = 'No timestamps were recorded in the session.';
 
+// The Upbuild form uses a 1-4 scale; its ratings become the ICF form's starting points
+const UPBUILD_TO_ICF = {
+  '4. Exceptional': 'Exceeds Standard',
+  '3. Competent': 'Meets Standard',
+  '2. Emerging': 'Below Standard',
+  '1. Not Demonstrated': 'Does Not Meet Standard',
+};
+
 function mentorInputs(feedback) {
   const ratings = feedback?.mentor_ratings || {};
   const text = feedback?.feedback_text || {};
   const answer = prefix => Object.entries(text).find(([q]) => q.startsWith(prefix))?.[1] || '';
   const competencyRatings = {};
   for (const [skill, n] of Object.entries(SKILL_TO_COMPETENCY)) {
-    if (RATING_OPTIONS.includes(ratings[skill])) competencyRatings[n] = ratings[skill];
+    const icf = UPBUILD_TO_ICF[ratings[skill]] || (RATING_OPTIONS.includes(ratings[skill]) ? ratings[skill] : null);
+    if (icf) competencyRatings[n] = icf;
   }
   return {
     competencyRatings,
@@ -242,4 +251,4 @@ async function draftIcfForm({ structure, references, parsed, mentor, admin }) {
   return result;
 }
 
-module.exports = { draftIcfForm, assembleDraft, mentorInputs, statementIds, addUsage, newUsage, createCompletion, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };
+module.exports = { draftIcfForm, assembleDraft, mentorInputs, UPBUILD_TO_ICF, statementIds, addUsage, newUsage, createCompletion, SKILL_TO_COMPETENCY, NO_TIMESTAMPS };
