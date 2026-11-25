@@ -65,16 +65,9 @@ function sectionHeading(doc, text) {
   doc.y += 10;
 }
 
-// Every rating gets the same soft purple badge
-function badge(doc, text, x, centerY) {
-  if (!text || text === '—') {
-    doc.font('Helvetica').fontSize(9.5).fillColor(GRAY).text('—', x, centerY - 5, { lineBreak: false });
-    return;
-  }
-  doc.font('Helvetica-Bold').fontSize(8.5);
-  const w = doc.widthOfString(text) + 16;
-  doc.roundedRect(x, centerY - 9, w, 18, 9).fill('#EFE8F8');
-  doc.fillColor(PURPLE).text(text, x + 8, centerY - 4, { lineBreak: false });
+// Ratings are plain text
+function rating(doc, text, x, centerY) {
+  doc.font('Helvetica').fontSize(10).fillColor(text && text !== '—' ? INK : GRAY).text(text || '—', x, centerY - 5, { lineBreak: false });
 }
 
 function ratingsTable(doc, coachRatings, mentorRatings) {
@@ -105,8 +98,8 @@ function ratingsTable(doc, coachRatings, mentorRatings) {
     ensureRoom(rowH);
     const mid = y + rowH / 2;
     doc.font('Helvetica').fontSize(10).fillColor(INK).text(comp.name, MARGIN + 12, mid - 5, { width: nameW - 20, lineBreak: false, ellipsis: true });
-    badge(doc, String(coachRatings[comp.name] || '—'), MARGIN + nameW, mid);
-    badge(doc, String(mentorRatings[comp.name] || '—'), MARGIN + nameW + colW, mid);
+    rating(doc, String(coachRatings[comp.name] || '—'), MARGIN + nameW, mid);
+    rating(doc, String(mentorRatings[comp.name] || '—'), MARGIN + nameW + colW, mid);
     y += rowH;
     doc.moveTo(MARGIN + 12, y).lineTo(MARGIN + width, y).strokeColor(HAIRLINE).lineWidth(0.6).stroke();
   }
