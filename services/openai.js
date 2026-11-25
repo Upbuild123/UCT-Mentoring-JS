@@ -75,24 +75,9 @@ async function generateAiReview(assessment, transcript) {
   const client = getClient();
   const prompt = `You are an experienced coaching mentor reviewing a coaching session transcript.
 
-Your audience is NOT the coach.
+Your audience is NOT the coach. Your audience is the coach's mentor, who will use your observations to prepare a mentoring conversation and fill in a short form with the coach's strengths, development areas, and development practices.
 
-Your audience is the coach's mentor, who will use your observations to guide a mentoring conversation.
-
-Provide an honest, nuanced assessment of the coaching.
-
-Do not soften feedback unnecessarily. Do not inflate praise. Do not focus on encouragement. Focus on accurate diagnosis.
-
-Assume the mentor wants to understand:
-- What the coach does well.
-- What the coach tends to do repeatedly.
-- What coaching habits are helping.
-- What coaching habits are limiting depth.
-- What developmental edge would most improve the coach's effectiveness.
-
-Refer to the coach as "the coach" and the other person as "the client."
-
-Support observations with specific examples and quotes.
+Be honest and specific. Do not soften feedback or inflate praise. Refer to the coach as "the coach" and the other person as "the client." Support observations with short, verbatim quotes from the transcript (with the timestamp when the transcript has one). Keep it brief and easy to scan.
 
 ---
 
@@ -104,112 +89,36 @@ ${transcript}
 
 ## OUTPUT STRUCTURE
 
-Use this exact structure. Use ## markdown headings for each main section (as shown below), and bold/italic for sub-labels within a section. Format as a clean professional document.
+Use exactly these five sections, in this order, each with a ## markdown heading. Use a blank line between paragraphs and lists.
 
-## Summary
+## Strengths
 
-In 1-2 paragraphs, focused on the COACH (not a recap of the client's situation):
-- What was the coach's overall effectiveness?
-- What stands out most about the coach's style?
-- What appears to be the coach's single highest-leverage developmental edge (preview only — detailed below)?
+3 to 4 strengths. For each: a short bold title, then one or two sentences on what the coach did and its effect on the client, with a brief quote.
 
-## Dominant Coaching Strategy
+## Development Areas
 
-Diagnose the coach's dominant, default strategy in this session — e.g., validation, encouragement, problem-solving, reflection, reassurance, information-giving, etc. A coach can have more than one, but identify the most dominant one or two.
-
-For the dominant strategy:
-- Describe what it looks like in this coach's practice, with specific examples/quotes.
-- Benefits: what this strategy does well for the client and the relationship.
-- Costs: what this strategy tends to crowd out, avoid, or limit when overused.
+3 to 4 development areas. For each: a short bold title, then one or two sentences on what happened and what it limited, with a brief quote. Focus on patterns that showed up more than once.
 
 ## Client Agendas
 
-Based on the transcript, identify:
+One or two lines each:
+- *Presenting agenda:* what the client wants to work on and the outcome they want.
+- *Deeper agenda:* what is underneath it and why it matters to the client.
+- *Transformational agenda:* who the client is becoming.
 
-*Presenting Agenda*
-[What the client wants to work on and the expected outcome.]
+Then one sentence on which level the coach mostly worked at.
 
-*Deeper Agenda*
-[What is underneath the presenting agenda, and why it matters to the client.]
+## Possible Practices
 
-*Potential Transformational Agenda*
-[Who the client is becoming — the deepest level of coaching available in this session.]
+2 to 3 concrete practices the coach can try in the next session, each phrased as an in-session action (for example, "When the client..., ask..."). No books, courses, or general advice.
 
-Then assess: at which of these levels was the coach actually working? Was that the appropriate level given where the client was, or did the coach stay shallower (or go deeper) than the client was ready for?
+## Key Moments
 
-## Meta-Skills
-
-Assess the coach specifically on two meta-skills:
-
-*Serve Not Fix (Coaching the Person, Not the Problem)*
-- Was the coach working with the whole person or focused on solving the presenting problem?
-- Were there moments of advice-giving, rescuing, or fixing disguised as coaching?
-- Did the client do their own work, or did the coach do it for them?
-- Specific examples from the transcript.
-
-*Experiment and Learn*
-- Did the coach try anything new, unexpected, or risky for the sake of the client?
-- Was there evidence of following intuition or taking an exploratory risk?
-- Or did the coach stay in comfortable, predictable patterns?
-- Specific examples from the transcript.
-
-## Coaching Strengths
-
-Identify between 3 and 7 strengths — no fewer than 3, no more than 7. For each:
-
-*[Strength title]*
-- What the coach did.
-- Why it worked.
-- How it affected the client.
-- Evidence from the transcript.
-
-Focus on recurring strengths — patterns that showed up more than once — not isolated moments.
-
-## Deepest Doorways
-
-Identify 1-5 moments with the greatest transformational potential. For each:
-- Quote the client's statement.
-- Explain why it mattered.
-- Explain what the coach did.
-- Explain where the coaching might have gone if the coach had stayed there longer.
-- Connect this moment to the coach's broader pattern: is this part of the dominant strategy/habit identified above, or a departure from it?
-
-Focus on moments where identity, values, fear, assumptions, tension, purpose, or meaning emerged.
-
-## The Highest-Leverage Developmental Edge
-
-Do not list multiple developmental opportunities. Identify ONE single developmental edge — the one that, if shifted, would most improve this coach's effectiveness across sessions, not just this one.
-
-Structure:
-
-*Recurring Pattern*
-[Describe the pattern as it showed up repeatedly throughout this session — cite at least 2-3 distinct moments/quotes as evidence, not just one isolated instance.]
-
-*Why It Matters*
-[Why this pattern, if it persists across sessions, caps the coach's growth or the client's depth of work. Connect to the dominant strategy and its costs identified earlier.]
-
-*The Edge*
-[Name the shift in one or two sentences — what would the coach do differently.]
-
-## One Practice to Carry Forward
-
-Replace generic suggestions with ONE concrete behavioral practice the coach can apply across the next several sessions (not just the next one). It should be specific enough that the coach knows exactly what to do differently in the moment.
-
-Do NOT recommend books, workshops, courses, certifications, supervision, or other generic professional development activities.
-
-Structure:
-
-*The Practice*
-[A specific, repeatable in-session behavior — phrased as an action, e.g., "When the client X, do Y instead of Z."]
-
-*Success Metric*
-[What a mentor could observe across future session recordings/transcripts that would indicate the coach is making this shift — be concrete enough to actually check for.]
+2 to 3 moments with the most potential for the client (identity, values, fear, assumptions, meaning). For each: the client's words, what the coach did, and where the coaching could have gone.
 
 ---
 
-Base your evaluation entirely on what you observe in the transcript. Do not reference any self-ratings or written reflections submitted separately.
-
-Formatting: Write in clear, well-spaced prose and bullet points. Use a blank line between every paragraph, heading, and bullet list so the document is easy to scan — never run sections together.`;
+Base everything on the transcript only. Do not reference any self-ratings or written reflections.`;
 
   return withRetry(async () => {
     const response = await client.chat.completions.create({
