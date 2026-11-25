@@ -77,7 +77,7 @@ async function generateAiReview(assessment, transcript) {
 
 Your audience is NOT the coach. Your audience is the coach's mentor, who will use your observations to prepare a mentoring conversation and fill in a short form with the coach's strengths, development areas, and development practices.
 
-Be honest and specific. Do not soften feedback or inflate praise. Refer to the coach as "the coach" and the other person as "the client." Support observations with short, verbatim quotes from the transcript (with the timestamp when the transcript has one). Keep it brief and easy to scan.
+Be honest and specific. Do not soften feedback or inflate praise. Refer to the coach as "the coach" and the other person as "the client." Support strengths with short, verbatim quotes from the transcript (with the timestamp when the transcript has one). Keep it brief and easy to scan.
 
 ---
 
@@ -103,13 +103,11 @@ One or two sentences on what the coach did and its effect on the client.
 
 ## Development Areas
 
-3 to 4 development areas, focusing on patterns that showed up more than once. For each, use exactly this shape:
+3 to 4 development areas, focusing on patterns that showed up more than once. For each, use exactly this shape, with no quote:
 
 ### [Short title]
 
-One or two sentences on what happened and what it limited.
-
-> "Brief verbatim quote" (timestamp if available)
+One or two sentences on what the coach did or missed, and what it limited.
 
 ## Client Agendas
 
