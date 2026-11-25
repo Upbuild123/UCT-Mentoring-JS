@@ -129,14 +129,13 @@ describe('assembling the draft', () => {
     expect(review.statements['A3.3']).toMatchObject({ startingRating: 'Meets Standard', aiRating: 'Below Standard', reason: 'No question about importance.', flags: [] });
   });
 
-  test('borderline ratings are flagged; recording checks become one note at the top', () => {
+  test('borderline calls are left to the mentor; recording checks become one note at the top', () => {
     const results = allIds.map(id => statementResult(id));
     results[0] = statementResult('A3.1', { borderline_alternative: 'Below Standard', borderline_note: 'Close call.' });
     results[13] = statementResult(allIds[13], { verify_against_recording: 'silence' });
     const { review } = build(results);
-    expect(review.statements['A3.1'].flags[0].message).toContain('Borderline: Meets Standard or Below Standard');
     expect(review.general.join(' ')).toContain(`check ${allIds[13]}`);
-    expect(Object.values(review.statements).flatMap(s => s.flags)).toHaveLength(1);
+    expect(Object.values(review.statements).flatMap(s => s.flags)).toHaveLength(0);
   });
 
   test('notes missing timestamps; admin defaults need no warnings', () => {

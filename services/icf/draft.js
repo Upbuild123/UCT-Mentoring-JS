@@ -153,7 +153,6 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
     }
 
     if (!s.evidence_groups.some(g => g.items.length)) flags.push({ type: 'evidence', message: 'No transcript evidence was listed. Add evidence or confirm the rating.' });
-    if (s.borderline_alternative && s.borderline_alternative !== s.rating) flags.push({ type: 'borderline', message: `Borderline: ${s.rating} or ${s.borderline_alternative}. ${s.borderline_note}` });
     if (s.rating === 'N/A') flags.push({ type: 'na', message: 'Rated N/A. ICF allows this only in rare cases where there was no opportunity to demonstrate the behavior. Please confirm.' });
     if (s.verify_against_recording) toVerify.push(st.id);
 
