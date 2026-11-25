@@ -65,9 +65,10 @@ function sectionHeading(doc, text) {
   doc.y += 10;
 }
 
-// Ratings are plain text
+// Ratings in Upbuild purple text, no background
 function rating(doc, text, x, centerY) {
-  doc.font('Helvetica').fontSize(10).fillColor(text && text !== '—' ? INK : GRAY).text(text || '—', x, centerY - 5, { lineBreak: false });
+  const given = text && text !== '—';
+  doc.font(given ? 'Helvetica-Bold' : 'Helvetica').fontSize(10).fillColor(given ? PURPLE : GRAY).text(text || '—', x, centerY - 5, { lineBreak: false });
 }
 
 function ratingsTable(doc, coachRatings, mentorRatings) {
