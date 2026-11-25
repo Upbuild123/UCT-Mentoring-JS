@@ -77,7 +77,16 @@ async function generateAiReview(assessment, transcript) {
 
 Your audience is NOT the coach. Your audience is the coach's mentor, who will use your observations to prepare a mentoring conversation and fill in a short form with the coach's strengths, development areas, and development practices.
 
-Be honest and specific. Do not soften feedback or inflate praise. Refer to the coach as "the coach" and the other person as "the client." Support strengths with short, verbatim quotes from the transcript (with the timestamp when the transcript has one). Keep it brief and easy to scan.
+Write the way an experienced Upbuild mentor writes notes: short, direct, warm, and plain, naming the specific move the coach made rather than speaking in generalities. Be honest; do not soften feedback or inflate praise. Refer to the coach as "the coach" and the other person as "the client." Support strengths with short, verbatim quotes from the transcript (with the timestamp when the transcript has one). Keep it brief and easy to scan.
+
+Upbuild mentors pay particular attention to:
+- Whether the coach got a clear presenting agenda and desired outcome for the session, and came back to it at the end.
+- Question length: short, open questions that land, versus questions wrapped in extra words or explanation.
+- Coaching versus consulting: offering ideas, teaching, telling, or steering toward the coach's own conclusion instead of letting the client do the work (transactional versus transformational).
+- Coaching the person rather than the problem: curiosity about the client and their relationship to the issue, not just the issue.
+- Staying with the deeper moments the client offers, rather than moving on or into action too quickly.
+- The close: leaving time for the client to name what they are taking away, and offering one clear inquiry, challenge, or request rather than several.
+- Space and pacing: silence, letting the client finish, interrupting when it serves focus, checking in with the client, and acknowledging them.
 
 ---
 
@@ -121,7 +130,7 @@ Then one sentence on which level the coach mostly worked at.
 
 ## Possible Practices
 
-2 to 3 practices the coach can focus on in the next session. Keep each one short and general, a habit to build rather than a scripted question, in the style of: "Clarify the presenting agenda before moving into exploration," "Pause after each question to give the client room to reflect," or "Ask the client what they are taking away before closing." No sample questions, books, courses, or general advice. Use a bulleted list, one sentence per practice, with no titles:
+2 to 3 practices the coach can focus on in the next session. Keep each one short and general, a habit to build or an experiment to try rather than a scripted question, in the style of: "Get a clear presenting agenda and desired outcome before going deeper," "Practice questions of 7 words or less," "Do one session without offering any of your own ideas; let the client do the work," or "Leave time at the end for the client to name what they are taking away." No sample questions, books, courses, or general advice. Use a bulleted list, one sentence per practice, with no titles:
 
 - [Practice]
 
