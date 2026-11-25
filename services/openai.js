@@ -103,10 +103,6 @@ ${transcript}
 
 Use exactly these six sections, in this order, each with a ## markdown heading. Use a blank line between every element.
 
-## Coaching Style
-
-One line only: 3 to 5 words or short phrases that capture the coach's style in this session, separated by commas (for example: warm, curious, upbeat, edgy).
-
 ## Strengths
 
 3 to 4 strengths. Anchor each one with at least one verbatim quote from the transcript, and add a second or third when it shows the coach doing it more than once. For each, use exactly this shape:
@@ -126,6 +122,10 @@ One or two sentences on what the coach did and its effect on the client.
 ### [Short title]
 
 One or two sentences on what the coach did or missed, and what it limited.
+
+## Coaching Style
+
+One line only: 3 to 5 words or short phrases that capture the coach's style in this session, separated by commas (for example: warm, curious, upbeat, edgy).
 
 ## Client Agendas
 
