@@ -105,29 +105,18 @@ async function sendIcfSigned({ mentorEmail, mentorName, studentName, roundNum, p
   });
 }
 
-async function sendCompetencyReviewSigned({ mentorEmail, studentEmail, studentName, pdfDriveUrl }) {
-  const studentFirst = studentName.split(' ')[0];
-  const client = getClient();
-  if (mentorEmail) {
-    await client.emails.send({
-      from: FROM(),
-      to: mentorEmail,
-      subject: `Signed ICF Competency Review. ${studentName}`,
-      html: `<p>The signed ICF Competency Review Form for ${studentFirst} has been saved and sent to ${studentFirst}.</p>
+// Like the observation forms, the Competency Review goes to faculty only
+async function sendCompetencyReviewSigned({ mentorEmail, mentorName, studentName, pdfDriveUrl }) {
+  if (!mentorEmail) return;
+  const mentorFirst = (mentorName || '').split(' ')[0];
+  await getClient().emails.send({
+    from: FROM(),
+    to: mentorEmail,
+    subject: `Signed ICF Competency Review. ${studentName}`,
+    html: `<p>Hi ${mentorFirst},</p>
+<p>The signed ICF Competency Review Form for ${studentName} has been saved to the faculty ICF Observation Forms folder. It has not been sent to the student.</p>
 <p><a href="${pdfDriveUrl}">View the signed Competency Review (PDF)</a></p>`,
-    });
-  }
-  if (studentEmail) {
-    await client.emails.send({
-      from: FROM(),
-      to: studentEmail,
-      subject: 'Your ICF Competency Review Form',
-      html: `<p>Hi ${studentFirst},</p>
-<p>Your mentor coach has signed your ICF Mentor Coaching Competency Review Form. It is saved in your Google Drive folder.</p>
-<p><a href="${pdfDriveUrl}">View your Competency Review Form (PDF)</a></p>
-<p>If you apply for an ICF credential, upload this form with your application.</p>`,
-    });
-  }
+  });
 }
 
 async function sendMentorReminder({ mentorEmail, mentorName, studentName, roundNum, assessmentId, mentorToken, dashboardToken, mentorId, reminderNum }) {

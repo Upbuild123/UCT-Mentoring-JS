@@ -120,16 +120,17 @@ async function signCompetencyReview(studentId, form) {
     err.problems = problems;
     throw err;
   }
-  const { student, assessments } = await loadEngagement(studentId);
-  const folderId = assessments.find(a => a.drive_folder_id)?.drive_folder_id;
-  if (!folderId) throw new Error('No Drive folder is recorded for this student.');
+  // Kept in the faculty-only folder with the signed Session Observation Forms
+  const folderId = process.env.ICF_FORMS_FOLDER_ID;
+  if (!folderId) throw new Error('ICF_FORMS_FOLDER_ID is not set, so there is nowhere to save the signed Competency Review.');
+  const { student } = await loadEngagement(studentId);
   const name = `Mentoring. ${student.name}. ICF Competency Review Form`;
   const pdf = await drive.convertDocxToPdf(await buildDocx(form), name);
   const pdfDriveUrl = await drive.uploadBuffer(pdf, folderId, `${name}.pdf`, 'application/pdf');
   await saveReview(studentId, { status: 'signed', form, signed_at: new Date().toISOString(), pdf_drive_url: pdfDriveUrl });
   await email.sendCompetencyReviewSigned({
     mentorEmail: student.mentors?.email,
-    studentEmail: student.email || '',
+    mentorName: student.mentors?.name || '',
     studentName: student.name,
     pdfDriveUrl,
   });
