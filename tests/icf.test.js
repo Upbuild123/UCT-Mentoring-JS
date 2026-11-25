@@ -129,12 +129,12 @@ describe('assembling the draft', () => {
     expect(review.statements['A3.3']).toMatchObject({ startingRating: 'Meets Standard', aiRating: 'Below Standard', reason: 'No question about importance.', flags: [] });
   });
 
-  test('borderline calls are left to the mentor; recording checks become one note at the top', () => {
+  test('borderline calls and recording checks are left to the mentor', () => {
     const results = allIds.map(id => statementResult(id));
     results[0] = statementResult('A3.1', { borderline_alternative: 'Below Standard', borderline_note: 'Close call.' });
     results[13] = statementResult(allIds[13], { verify_against_recording: 'silence' });
     const { review } = build(results);
-    expect(review.general.join(' ')).toContain(`check ${allIds[13]}`);
+    expect(review.general).toEqual([]);
     expect(Object.values(review.statements).flatMap(s => s.flags)).toHaveLength(0);
   });
 

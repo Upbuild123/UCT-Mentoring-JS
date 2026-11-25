@@ -123,7 +123,6 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
 
   // Warnings are kept to the judgment calls a mentor must make; routine checks the app can fix itself stay silent
   if (!hasTimestamps) general.push(`The transcript has no timestamps, so each evidence field says "${NO_TIMESTAMPS}"`);
-  const toVerify = [];
 
   const formStatements = {};
   const byId = Object.fromEntries(statementResults.map(s => [s.id, s]));
@@ -154,13 +153,11 @@ function assembleDraft({ structure, parsed, mentor, admin, statementResults, fee
 
     if (!s.evidence_groups.some(g => g.items.length)) flags.push({ type: 'evidence', message: 'No transcript evidence was listed. Add evidence or confirm the rating.' });
     if (s.rating === 'N/A') flags.push({ type: 'na', message: 'Rated N/A. ICF allows this only in rare cases where there was no opportunity to demonstrate the behavior. Please confirm.' });
-    if (s.verify_against_recording) toVerify.push(st.id);
 
     formStatements[st.id] = { rating: s.rating, evidence: formatEvidence(s, hasTimestamps) };
     // Shown beside "your rating" when the draft rates the behavior differently, not as a warning
     review.statements[st.id] = { startingRating: starting, aiRating: s.rating, reason: s.rating_reason, flags };
   }
-  if (toVerify.length) general.push(`A transcript can't show silence, tone, or how interruptions landed. When you listen to the recording, check ${toVerify.join(', ')}.`);
 
   // Observation Feedback: one slot per competency in each section
   const ratingOf = id => formStatements[id]?.rating;
